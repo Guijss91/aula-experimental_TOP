@@ -56,7 +56,10 @@ def update_professors():
 @app.route('/api/n8n-webhook-url', methods=['GET'])
 def get_n8n_url():
     config = load_config()
-    return jsonify({'n8n_webhook': config.get('n8n_webhook', '')})
+    return jsonify({
+        'n8n_webhook': config.get('n8n_webhook', ''),
+        'sheet_url': config.get('sheet_url', '')  # <-- incluído para acompanhar o body das requisições ao webhook
+    })
 
 @app.route('/api/config/webhook', methods=['POST'])
 def update_webhook():

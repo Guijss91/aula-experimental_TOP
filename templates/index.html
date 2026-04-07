@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="pt-BR" data-theme="light">
+<html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
@@ -8,64 +8,115 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300..700&display=swap" rel="stylesheet">
-  <style type="text/tailwindcss">
-    @theme {
-      --font-body: 'Inter', 'Helvetica Neue', sans-serif;
-      --color-primary: #01696f;
-      --color-primary-hover: #0c4e54;
-      --color-bg: #f7f6f2;
-      --color-surface: #f9f8f5;
-      --color-border: #d4d1ca;
-      --color-text: #28251d;
-      --color-text-muted: #7a7974;
-      --color-error: #a12c7b;
+  <style>
+    :root {
+      --color-primary:        #4f98a3;
+      --color-primary-hover:  #227f8b;
+      --color-bg:             #171614;
+      --color-surface:        #1c1b19;
+      --color-surface-2:      #22211f;
+      --color-border:         #393836;
+      --color-border-strong:  #4a4947;
+      --color-text:           #ffffff;
+      --color-text-muted:     #a8a7a4;
+      --color-error:          #d163a7;
+      --color-btn-idle-bg:    #2a2927;
+      --color-btn-idle-border:#4a4947;
+      --radius-sm: 6px;
+      --radius-md: 8px;
+      --radius-lg: 12px;
     }
 
-    [data-theme="dark"] {
-      --color-bg: #171614;
-      --color-surface: #1c1b19;
-      --color-border: #393836;
-      --color-text: #cdccca;
-      --color-text-muted: #797876;
-      --color-primary: #4f98a3;
-      --color-primary-hover: #227f8b;
-    }
-  </style>
-  <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     html { -webkit-text-size-adjust: none; scroll-behavior: smooth; }
+
     body {
       font-family: 'Inter', sans-serif;
-      background-color: var(--color-bg, #f7f6f2);
-      color: var(--color-text, #28251d);
+      background-color: var(--color-bg);
+      color: var(--color-text);
       min-height: 100dvh;
       font-size: 16px;
       line-height: 1.6;
       -webkit-font-smoothing: antialiased;
     }
-    input, select, textarea, button { font: inherit; color: inherit; }
-    :focus-visible { outline: 2px solid var(--color-primary); outline-offset: 3px; border-radius: 6px; }
+
+    *, *::placeholder { color: inherit; }
+    input, select, textarea, button { font: inherit; }
+    input, select, textarea { color: var(--color-text) !important; }
+    input::placeholder, textarea::placeholder { color: var(--color-text-muted) !important; }
+
+    :focus-visible {
+      outline: 2px solid var(--color-primary);
+      outline-offset: 3px;
+      border-radius: var(--radius-sm);
+    }
 
     input[type="date"]::-webkit-calendar-picker-indicator {
       cursor: pointer;
-      opacity: 0.6;
-      filter: invert(0);
-    }
-    [data-theme="dark"] input[type="date"]::-webkit-calendar-picker-indicator {
       filter: invert(1);
+      opacity: 0.6;
+    }
+
+    .section-card {
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-lg);
+      padding: 1.25rem;
+      margin-bottom: 1rem;
+    }
+
+    .section-label {
+      font-size: 0.8125rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--color-text-muted);
+      margin-bottom: 0.875rem;
+    }
+
+    .field-input {
+      width: 100%;
+      padding: 0.625rem 0.75rem;
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-md);
+      background: var(--color-surface-2);
+      font-size: 0.9375rem;
+      color: var(--color-text);
+      transition: border-color 150ms;
+    }
+    .field-input:focus { border-color: var(--color-primary); outline: none; }
+
+    .sel-btn {
+      background: var(--color-btn-idle-bg);
+      color: var(--color-text);
+      border: 1.5px solid var(--color-btn-idle-border);
+      border-radius: var(--radius-md);
+      cursor: pointer;
+      transition: background 150ms, border-color 150ms, box-shadow 150ms;
+      text-align: center;
+    }
+    .sel-btn:hover {
+      background: #353432;
+      border-color: #5a5957;
+    }
+    .sel-btn.active {
+      background: var(--color-primary) !important;
+      color: #fff !important;
+      border-color: var(--color-primary) !important;
     }
 
     .schedule-cell {
       cursor: pointer;
       user-select: none;
       transition: background 150ms, color 150ms;
+      color: var(--color-text-muted);
     }
     .schedule-cell.selected {
-      background-color: var(--color-primary, #01696f) !important;
-      color: white !important;
+      background: var(--color-primary) !important;
+      color: #fff !important;
       font-weight: 600;
     }
-    .schedule-cell:active { opacity: 0.8; }
+    .schedule-cell:active { opacity: 0.7; }
 
     .toast {
       position: fixed;
@@ -73,7 +124,7 @@
       left: 50%;
       transform: translateX(-50%) translateY(100px);
       background: var(--color-primary);
-      color: white;
+      color: #fff;
       padding: 0.75rem 1.5rem;
       border-radius: 9999px;
       font-size: 0.875rem;
@@ -83,39 +134,23 @@
       opacity: 0;
       white-space: nowrap;
     }
-    .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
-    .toast.error { background: var(--color-error, #a12c7b); }
+    .toast.show  { transform: translateX(-50%) translateY(0); opacity: 1; }
+    .toast.error { background: var(--color-error); }
 
     .spinner {
       width: 18px; height: 18px;
       border: 2px solid rgba(255,255,255,0.3);
-      border-top-color: white;
+      border-top-color: #fff;
       border-radius: 50%;
       animation: spin 0.7s linear infinite;
       display: inline-block;
     }
     @keyframes spin { to { transform: rotate(360deg); } }
-
-    .field-group { position: relative; }
-
-    .section-card {
-      background: var(--color-surface, #f9f8f5);
-      border: 1px solid var(--color-border, #d4d1ca);
-      border-radius: 12px;
-      padding: 1.25rem;
-    }
-
-    [data-theme="dark"] .section-card { background: #1c1b19; border-color: #393836; }
-    [data-theme="dark"] input, [data-theme="dark"] select, [data-theme="dark"] textarea {
-      background: #22211f !important;
-      border-color: #393836 !important;
-    }
-    [data-theme="dark"] .schedule-header { background: #22211f; }
-    [data-theme="dark"] .schedule-body-cell { background: #1c1b19; }
   </style>
 </head>
-<body class="pb-24">
+<body style="padding-bottom:6rem;">
 
+  <!-- Header -->
   <header style="background:var(--color-surface);border-bottom:1px solid var(--color-border);position:sticky;top:0;z-index:50;">
     <div style="max-width:640px;margin:0 auto;padding:0.875rem 1rem;display:flex;align-items:center;justify-content:space-between;">
       <div style="display:flex;align-items:center;gap:0.625rem;">
@@ -125,127 +160,112 @@
           <circle cx="21" cy="19" r="3.5" fill="white"/>
           <path d="M19.5 19l1 1 1.5-1.5" stroke="var(--color-primary)" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
         </svg>
-        <span style="font-weight:700;font-size:1rem;color:var(--color-text);">Controle de aula experimental</span>
+        <span style="font-weight:700;font-size:1rem;">Controle de aula experimental</span>
       </div>
-      <div style="display:flex;align-items:center;gap:0.5rem;">
-        <button onclick="window.location='/admin'" style="font-size:0.8125rem;color:var(--color-text-muted);padding:0.4rem 0.875rem;border:1px solid var(--color-border);border-radius:8px;background:none;" aria-label="Admin">
-          ⚙ Admin
-        </button>
-        <button data-theme-toggle aria-label="Alternar tema" style="padding:0.4rem;border:none;background:none;color:var(--color-text-muted);border-radius:8px;line-height:0;">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
-        </button>
-      </div>
+      <button onclick="window.location='/admin'"
+        style="font-size:0.8125rem;color:var(--color-text-muted);padding:0.4rem 0.875rem;border:1px solid var(--color-border);border-radius:var(--radius-md);background:none;cursor:pointer;"
+        aria-label="Admin">
+        ⚙ Admin
+      </button>
     </div>
   </header>
 
+  <!-- Main -->
   <main style="max-width:640px;margin:0 auto;padding:1.25rem 1rem;">
-    <h1 style="font-size:1.375rem;font-weight:700;margin-bottom:0.25rem;color:var(--color-text);">Novo Lead</h1>
+    <h1 style="font-size:1.375rem;font-weight:700;margin-bottom:0.25rem;">Novo Lead</h1>
     <p style="font-size:0.875rem;color:var(--color-text-muted);margin-bottom:1.5rem;">Preencha os dados do aluno interessado.</p>
 
     <form id="leadForm" novalidate>
 
       <!-- Datas -->
-      <div class="section-card" style="margin-bottom:1rem;">
-        <p style="font-size:0.8125rem;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;color:var(--color-text-muted);margin-bottom:0.875rem;">Datas</p>
+      <div class="section-card">
+        <p class="section-label">Datas</p>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.875rem;">
           <div>
             <label for="dataLead" style="display:block;font-size:0.8125rem;font-weight:500;margin-bottom:0.375rem;">Data do Lead</label>
-            <input type="date" id="dataLead" name="dataLead"
-              style="width:100%;padding:0.625rem 0.75rem;border:1px solid var(--color-border);border-radius:8px;background:var(--color-surface);font-size:0.9375rem;">
+            <input type="date" id="dataLead" name="dataLead" class="field-input">
           </div>
           <div>
-            <label for="dataAulaDemo" style="display:block;font-size:0.8125rem;font-weight:500;margin-bottom:0.375rem;">Aula Demo</label>
-            <input type="date" id="dataAulaDemo" name="dataAulaDemo"
-              style="width:100%;padding:0.625rem 0.75rem;border:1px solid var(--color-border);border-radius:8px;background:var(--color-surface);font-size:0.9375rem;">
+            <label for="dataAulaDemo" style="display:block;font-size:0.8125rem;font-weight:500;margin-bottom:0.375rem;">Data Aula Demo</label>
+            <input type="date" id="dataAulaDemo" name="dataAulaDemo" class="field-input">
           </div>
         </div>
       </div>
 
       <!-- Aluno -->
-      <div class="section-card" style="margin-bottom:1rem;">
-        <p style="font-size:0.8125rem;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;color:var(--color-text-muted);margin-bottom:0.875rem;">Aluno <span style="color:var(--color-error);">*</span></p>
+      <div class="section-card">
+        <p class="section-label">Aluno <span style="color:var(--color-error);">*</span></p>
         <input type="text" id="aluno" name="aluno" placeholder="Nome do aluno" required
-          style="width:100%;padding:0.625rem 0.75rem;border:1px solid var(--color-border);border-radius:8px;background:var(--color-surface);font-size:0.9375rem;"
-          maxlength="100">
-        <p id="alunoError" style="font-size:0.8125rem;color:var(--color-error);margin-top:0.375rem;display:none;">Nome do aluno é obrigatório.</p>
+          class="field-input" maxlength="100">
+        <p id="alunoError" style="font-size:0.8125rem;color:var(--color-error);margin-top:0.375rem;display:none;">
+          Nome do aluno é obrigatório.
+        </p>
       </div>
 
       <!-- Livro -->
-      <div class="section-card" style="margin-bottom:1rem;">
-        <p style="font-size:0.8125rem;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;color:var(--color-text-muted);margin-bottom:0.875rem;">Livro</p>
+      <div class="section-card">
+        <p class="section-label">Livro</p>
         <div style="display:flex;gap:0.5rem;flex-wrap:wrap;">
-          <button type="button" class="livro-btn" data-value="1" style="padding:0.5rem 1rem;border:1px solid var(--color-border);border-radius:8px;background:none;font-size:0.875rem;color:var(--color-text-muted);">1</button>
-          <button type="button" class="livro-btn" data-value="2" style="padding:0.5rem 1rem;border:1px solid var(--color-border);border-radius:8px;background:none;font-size:0.875rem;color:var(--color-text-muted);">2</button>
-          <button type="button" class="livro-btn" data-value="3" style="padding:0.5rem 1rem;border:1px solid var(--color-border);border-radius:8px;background:none;font-size:0.875rem;color:var(--color-text-muted);">3</button>
-          <button type="button" class="livro-btn" data-value="4" style="padding:0.5rem 1rem;border:1px solid var(--color-border);border-radius:8px;background:none;font-size:0.875rem;color:var(--color-text-muted);">4</button>
-          <button type="button" class="livro-btn" data-value="5" style="padding:0.5rem 1rem;border:1px solid var(--color-border);border-radius:8px;background:none;font-size:0.875rem;color:var(--color-text-muted);">5</button>
+          <button type="button" class="sel-btn livro-btn" data-value="1" style="padding:0.5rem 1rem;font-size:0.875rem;">1</button>
+          <button type="button" class="sel-btn livro-btn" data-value="2" style="padding:0.5rem 1rem;font-size:0.875rem;">2</button>
+          <button type="button" class="sel-btn livro-btn" data-value="3" style="padding:0.5rem 1rem;font-size:0.875rem;">3</button>
+          <button type="button" class="sel-btn livro-btn" data-value="4" style="padding:0.5rem 1rem;font-size:0.875rem;">4</button>
+          <button type="button" class="sel-btn livro-btn" data-value="5" style="padding:0.5rem 1rem;font-size:0.875rem;">5</button>
         </div>
         <input type="hidden" id="livro" name="livro" value="">
       </div>
 
       <!-- Horário das Aulas -->
-      <div class="section-card" style="margin-bottom:1rem;">
-        <p style="font-size:0.8125rem;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;color:var(--color-text-muted);margin-bottom:0.875rem;">Horário das Aulas</p>
-        <p style="font-size:0.8125rem;color:var(--color-text-muted);margin-bottom:0.75rem;">Selecione os dias e horários de disponibilidade do aluno.</p>
+      <div class="section-card">
+        <p class="section-label">Horário das Aulas</p>
+        <p style="font-size:0.8125rem;color:var(--color-text-muted);margin-bottom:0.75rem;">
+          Selecione os dias e horários de disponibilidade do aluno.
+        </p>
         <div style="overflow-x:auto;-webkit-overflow-scrolling:touch;">
           <table id="scheduleTable" style="min-width:400px;border-collapse:collapse;width:100%;font-size:0.8125rem;">
             <thead>
               <tr>
-                <th style="padding:0.5rem 0.4rem;text-align:center;font-weight:600;color:var(--color-text-muted);background:var(--color-bg);border-radius:4px 0 0 4px;border:1px solid var(--color-border);width:56px;font-size:0.75rem;">Horário</th>
-                <th class="schedule-header" data-day="Seg" style="padding:0.5rem 0.25rem;text-align:center;border:1px solid var(--color-border);color:var(--color-text-muted);background:var(--color-bg);font-size:0.75rem;">Seg</th>
-                <th class="schedule-header" data-day="Ter" style="padding:0.5rem 0.25rem;text-align:center;border:1px solid var(--color-border);color:var(--color-text-muted);background:var(--color-bg);font-size:0.75rem;">Ter</th>
-                <th class="schedule-header" data-day="Qua" style="padding:0.5rem 0.25rem;text-align:center;border:1px solid var(--color-border);color:var(--color-text-muted);background:var(--color-bg);font-size:0.75rem;">Qua</th>
-                <th class="schedule-header" data-day="Qui" style="padding:0.5rem 0.25rem;text-align:center;border:1px solid var(--color-border);color:var(--color-text-muted);background:var(--color-bg);font-size:0.75rem;">Qui</th>
-                <th class="schedule-header" data-day="Sex" style="padding:0.5rem 0.25rem;text-align:center;border:1px solid var(--color-border);color:var(--color-text-muted);background:var(--color-bg);font-size:0.75rem;">Sex</th>
-                <th class="schedule-header" data-day="Sáb" style="padding:0.5rem 0.25rem;text-align:center;border:1px solid var(--color-border);color:var(--color-text-muted);background:var(--color-bg);font-size:0.75rem;">Sáb</th>
-                <th class="schedule-header" data-day="Dom" style="padding:0.5rem 0.25rem;text-align:center;border:1px solid var(--color-border);color:var(--color-text-muted);background:var(--color-bg);font-size:0.75rem;">Dom</th>
+                <th style="padding:0.5rem 0.4rem;text-align:center;font-weight:600;color:var(--color-text-muted);background:var(--color-bg);border:1px solid var(--color-border);width:56px;font-size:0.75rem;">Horário</th>
+                <th style="padding:0.5rem 0.25rem;text-align:center;border:1px solid var(--color-border);color:var(--color-text-muted);background:var(--color-surface-2);font-size:0.75rem;">Seg</th>
+                <th style="padding:0.5rem 0.25rem;text-align:center;border:1px solid var(--color-border);color:var(--color-text-muted);background:var(--color-surface-2);font-size:0.75rem;">Ter</th>
+                <th style="padding:0.5rem 0.25rem;text-align:center;border:1px solid var(--color-border);color:var(--color-text-muted);background:var(--color-surface-2);font-size:0.75rem;">Qua</th>
+                <th style="padding:0.5rem 0.25rem;text-align:center;border:1px solid var(--color-border);color:var(--color-text-muted);background:var(--color-surface-2);font-size:0.75rem;">Qui</th>
+                <th style="padding:0.5rem 0.25rem;text-align:center;border:1px solid var(--color-border);color:var(--color-text-muted);background:var(--color-surface-2);font-size:0.75rem;">Sex</th>
+                <th style="padding:0.5rem 0.25rem;text-align:center;border:1px solid var(--color-border);color:var(--color-text-muted);background:var(--color-surface-2);font-size:0.75rem;">Sáb</th>
+                <th style="padding:0.5rem 0.25rem;text-align:center;border:1px solid var(--color-border);color:var(--color-text-muted);background:var(--color-surface-2);font-size:0.75rem;">Dom</th>
               </tr>
             </thead>
             <tbody id="scheduleBody"></tbody>
           </table>
         </div>
-        <div style="margin-top:0.75rem;padding:0.625rem 0.75rem;background:var(--color-bg);border-radius:8px;border:1px solid var(--color-border);min-height:2.5rem;">
+        <div style="margin-top:0.75rem;padding:0.625rem 0.75rem;background:var(--color-surface-2);border-radius:var(--radius-md);border:1px solid var(--color-border);min-height:2.5rem;">
           <span id="scheduleSummary" style="font-size:0.8125rem;color:var(--color-text-muted);">Nenhum horário selecionado</span>
         </div>
         <input type="hidden" id="horarioAulas" name="horarioAulas" value="">
       </div>
 
       <!-- Modalidade -->
-      <div class="section-card" style="margin-bottom:1rem;">
-        <p style="font-size:0.8125rem;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;color:var(--color-text-muted);margin-bottom:0.875rem;">Modalidade</p>
+      <div class="section-card">
+        <p class="section-label">Modalidade</p>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.5rem;margin-bottom:0.875rem;">
-          <button type="button" class="modalidade-btn" data-value="Online"
-            style="padding:0.625rem;border:1px solid var(--color-border);border-radius:8px;background:none;font-size:0.875rem;text-align:center;">
-            🌐 Online
-          </button>
-          <button type="button" class="modalidade-btn" data-value="Presencial"
-            style="padding:0.625rem;border:1px solid var(--color-border);border-radius:8px;background:none;font-size:0.875rem;text-align:center;">
-            🏫 Presencial
-          </button>
+          <button type="button" class="sel-btn modalidade-btn" data-value="Online"
+            style="padding:0.625rem;font-size:0.875rem;">🌐 Online</button>
+          <button type="button" class="sel-btn modalidade-btn" data-value="Presencial"
+            style="padding:0.625rem;font-size:0.875rem;">🏫 Presencial</button>
         </div>
         <div id="formatoContainer" style="display:none;">
           <p style="font-size:0.8125rem;color:var(--color-text-muted);margin-bottom:0.5rem;">Formato da turma:</p>
           <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:0.5rem;">
-            <button type="button" class="formato-btn" data-value="Individual VIP"
-              style="padding:0.5rem 0.25rem;border:1px solid var(--color-border);border-radius:8px;background:none;font-size:0.8125rem;text-align:center;">
-              👤 VIP
-            </button>
-            <button type="button" class="formato-btn" data-value="Dupla"
-              style="padding:0.5rem 0.25rem;border:1px solid var(--color-border);border-radius:8px;background:none;font-size:0.8125rem;text-align:center;">
-              👥 Dupla
-            </button>
-            <button type="button" class="formato-btn" data-value="Trio"
-              style="padding:0.5rem 0.25rem;border:1px solid var(--color-border);border-radius:8px;background:none;font-size:0.8125rem;text-align:center;">
-              👨‍👩‍👦 Trio
-            </button>
-            <button type="button" class="formato-btn" data-value="Quarteto"
-              style="padding:0.5rem 0.25rem;border:1px solid var(--color-border);border-radius:8px;background:none;font-size:0.8125rem;text-align:center;">
-              🏘 Quarteto
-            </button>
-            <button type="button" class="formato-btn" data-value="Quinteto"
-              style="padding:0.5rem 0.25rem;border:1px solid var(--color-border);border-radius:8px;background:none;font-size:0.8125rem;text-align:center;">
-              🏟 Quinteto
-            </button>
+            <button type="button" class="sel-btn formato-btn" data-value="Individual VIP"
+              style="padding:0.5rem 0.25rem;font-size:0.8125rem;">👤 VIP</button>
+            <button type="button" class="sel-btn formato-btn" data-value="Dupla"
+              style="padding:0.5rem 0.25rem;font-size:0.8125rem;">👥 Dupla</button>
+            <button type="button" class="sel-btn formato-btn" data-value="Trio"
+              style="padding:0.5rem 0.25rem;font-size:0.8125rem;">👨‍👩‍👦 Trio</button>
+            <button type="button" class="sel-btn formato-btn" data-value="Quarteto"
+              style="padding:0.5rem 0.25rem;font-size:0.8125rem;">🏘 Quarteto</button>
+            <button type="button" class="sel-btn formato-btn" data-value="Quinteto"
+              style="padding:0.5rem 0.25rem;font-size:0.8125rem;">🏟 Quinteto</button>
           </div>
         </div>
         <div id="modalidadePreview" style="margin-top:0.75rem;display:none;">
@@ -256,17 +276,17 @@
       </div>
 
       <!-- Observação -->
-      <div class="section-card" style="margin-bottom:1rem;">
-        <label for="observacao" style="display:block;font-size:0.8125rem;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;color:var(--color-text-muted);margin-bottom:0.875rem;">Observação</label>
-        <textarea id="observacao" name="observacao" rows="3" placeholder="Informações adicionais sobre o aluno como horários irregulares, etc..."
-          style="width:100%;padding:0.625rem 0.75rem;border:1px solid var(--color-border);border-radius:8px;background:var(--color-surface);font-size:0.9375rem;resize:none;line-height:1.5;" maxlength="500"></textarea>
+      <div class="section-card">
+        <label for="observacao" class="section-label" style="display:block;">Observação</label>
+        <textarea id="observacao" name="observacao" rows="3"
+          placeholder="Informações adicionais sobre o aluno como horários irregulares, etc..."
+          class="field-input" style="resize:none;line-height:1.5;" maxlength="500"></textarea>
       </div>
 
       <!-- Professor -->
-      <div class="section-card" style="margin-bottom:1rem;">
-        <label for="professor" style="display:block;font-size:0.8125rem;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;color:var(--color-text-muted);margin-bottom:0.875rem;">Professor</label>
-        <select id="professor" name="professor"
-          style="width:100%;padding:0.625rem 0.75rem;border:1px solid var(--color-border);border-radius:8px;background:var(--color-surface);font-size:0.9375rem;appearance:auto;">
+      <div class="section-card">
+        <label for="professor" class="section-label" style="display:block;">Professor</label>
+        <select id="professor" name="professor" class="field-input" style="appearance:auto;">
           <option value="">Selecione um professor</option>
           {% for prof in professors %}
           <option value="{{ prof }}">{{ prof }}</option>
@@ -276,12 +296,11 @@
 
       <!-- Cidade -->
       <div class="section-card" style="margin-bottom:1.5rem;">
-        <p style="font-size:0.8125rem;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;color:var(--color-text-muted);margin-bottom:0.875rem;">Cidade</p>
+        <p class="section-label">Cidade</p>
         <div style="display:grid;grid-template-columns:auto 1fr;gap:0.625rem;align-items:start;">
           <div>
             <label for="estado" style="display:block;font-size:0.75rem;color:var(--color-text-muted);margin-bottom:0.375rem;">Estado</label>
-            <select id="estado" name="estado"
-              style="padding:0.625rem 0.5rem;border:1px solid var(--color-border);border-radius:8px;background:var(--color-surface);font-size:0.9375rem;appearance:auto;width:80px;">
+            <select id="estado" name="estado" class="field-input" style="appearance:auto;width:80px;padding:0.625rem 0.5rem;">
               <option value="">UF</option>
               <option>AC</option><option>AL</option><option>AP</option><option>AM</option>
               <option>BA</option><option>CE</option><option>DF</option><option>ES</option>
@@ -295,15 +314,14 @@
           <div>
             <label for="cidade" style="display:block;font-size:0.75rem;color:var(--color-text-muted);margin-bottom:0.375rem;">Cidade</label>
             <input type="text" id="cidade" name="cidade" placeholder="Ex: Brasília"
-              style="width:100%;padding:0.625rem 0.75rem;border:1px solid var(--color-border);border-radius:8px;background:var(--color-surface);font-size:0.9375rem;"
-              maxlength="60">
+              class="field-input" maxlength="60">
           </div>
         </div>
       </div>
 
       <!-- Submit -->
       <button type="submit" id="submitBtn"
-        style="width:100%;padding:0.875rem;background:var(--color-primary);color:white;border:none;border-radius:12px;font-size:1rem;font-weight:600;display:flex;align-items:center;justify-content:center;gap:0.5rem;min-height:52px;touch-action:manipulation;">
+        style="width:100%;padding:0.875rem;background:var(--color-primary);color:#fff;border:none;border-radius:var(--radius-lg);font-size:1rem;font-weight:600;display:flex;align-items:center;justify-content:center;gap:0.5rem;min-height:52px;touch-action:manipulation;cursor:pointer;transition:background 150ms;">
         <span id="submitText">Enviar Lead</span>
       </button>
 
@@ -313,38 +331,27 @@
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
 
   <script>
-  (function(){
-    const t = document.querySelector('[data-theme-toggle]');
-    const r = document.documentElement;
-    let d = matchMedia('(prefers-color-scheme:dark)').matches ? 'dark' : 'light';
-    r.setAttribute('data-theme', d);
-    if(t) t.addEventListener('click', () => {
-      d = d === 'dark' ? 'light' : 'dark';
-      r.setAttribute('data-theme', d);
-    });
-  })();
-
   const hours = ['07h','08h','09h','10h','11h','12h','13h','14h','15h','16h','17h','18h','19h','20h','21h','22h'];
-  const days = ['Seg','Ter','Qua','Qui','Sex','Sáb','Dom'];
+  const days  = ['Seg','Ter','Qua','Qui','Sex','Sáb','Dom'];
   const selectedCells = new Set();
 
   function buildScheduleTable() {
     const tbody = document.getElementById('scheduleBody');
     hours.forEach(h => {
       const tr = document.createElement('tr');
-      const th = document.createElement('td');
-      th.textContent = h;
-      th.style.cssText = 'padding:0.4rem;text-align:center;font-size:0.75rem;color:var(--color-text-muted);border:1px solid var(--color-border);white-space:nowrap;';
-      tr.appendChild(th);
+      const td0 = document.createElement('td');
+      td0.textContent = h;
+      td0.style.cssText = 'padding:0.4rem;text-align:center;font-size:0.75rem;color:var(--color-text-muted);border:1px solid var(--color-border);white-space:nowrap;background:var(--color-bg);';
+      tr.appendChild(td0);
       days.forEach(d => {
         const td = document.createElement('td');
-        td.className = 'schedule-cell schedule-body-cell';
+        td.className = 'schedule-cell';
         td.dataset.hour = h;
-        td.dataset.day = d;
-        td.style.cssText = 'padding:0.5rem 0.25rem;text-align:center;border:1px solid var(--color-border);border-radius:4px;min-width:36px;';
+        td.dataset.day  = d;
+        td.style.cssText = 'padding:0.5rem 0.25rem;text-align:center;border:1px solid var(--color-border);border-radius:4px;min-width:36px;background:var(--color-surface);';
         td.textContent = '·';
         td.addEventListener('click', () => toggleCell(td, h, d));
-        td.addEventListener('touchend', (e) => { e.preventDefault(); toggleCell(td, h, d); });
+        td.addEventListener('touchend', e => { e.preventDefault(); toggleCell(td, h, d); });
         tr.appendChild(td);
       });
       tbody.appendChild(tr);
@@ -373,92 +380,54 @@
       byDay[d].push(h);
     });
     const parts = days.filter(d => byDay[d]).map(d => d + ' ' + byDay[d].join('/'));
-    const summary = parts.length ? parts.join(' | ') : 'Nenhum horário selecionado';
-    document.getElementById('scheduleSummary').textContent = summary;
+    document.getElementById('scheduleSummary').textContent = parts.length ? parts.join(' | ') : 'Nenhum horário selecionado';
     document.getElementById('horarioAulas').value = parts.join(', ');
   }
 
   buildScheduleTable();
 
-  let selectedLivro = '';
-  document.querySelectorAll('.livro-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-      selectedLivro = selectedLivro === btn.dataset.value ? '' : btn.dataset.value;
-      document.querySelectorAll('.livro-btn').forEach(b => {
-        if (b.dataset.value === selectedLivro) {
-          b.style.background = 'var(--color-primary)';
-          b.style.color = 'white';
-          b.style.borderColor = 'var(--color-primary)';
-        } else {
-          b.style.background = 'none';
-          b.style.color = 'var(--color-text-muted)';
-          b.style.borderColor = 'var(--color-border)';
-        }
-      });
-      document.getElementById('livro').value = selectedLivro;
+  function toggleSelBtn(group, clickedValue) {
+    let current = group[0]?.dataset._selected || '';
+    const next = current === clickedValue ? '' : clickedValue;
+    group.forEach(b => {
+      b.dataset._selected = next;
+      b.classList.toggle('active', b.dataset.value === next);
     });
-  });
-
-  let modalidadeSel = '', formatoSel = '';
-
-  document.querySelectorAll('.modalidade-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-      modalidadeSel = modalidadeSel === btn.dataset.value ? '' : btn.dataset.value;
-      document.querySelectorAll('.modalidade-btn').forEach(b => {
-        if (b.dataset.value === modalidadeSel) {
-          b.style.background = 'var(--color-primary)';
-          b.style.color = 'white';
-          b.style.borderColor = 'var(--color-primary)';
-        } else {
-          b.style.background = 'none';
-          b.style.color = 'var(--color-text)';
-          b.style.borderColor = 'var(--color-border)';
-        }
-      });
-      document.getElementById('formatoContainer').style.display = modalidadeSel ? 'block' : 'none';
-      if (!modalidadeSel) { formatoSel = ''; resetFormatos(); }
-      updateModalidade();
-    });
-  });
-
-  document.querySelectorAll('.formato-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-      formatoSel = formatoSel === btn.dataset.value ? '' : btn.dataset.value;
-      document.querySelectorAll('.formato-btn').forEach(b => {
-        if (b.dataset.value === formatoSel) {
-          b.style.background = 'var(--color-primary)';
-          b.style.color = 'white';
-          b.style.borderColor = 'var(--color-primary)';
-        } else {
-          b.style.background = 'none';
-          b.style.color = 'var(--color-text)';
-          b.style.borderColor = 'var(--color-border)';
-        }
-      });
-      updateModalidade();
-    });
-  });
-
-  function resetFormatos() {
-    document.querySelectorAll('.formato-btn').forEach(b => {
-      b.style.background = 'none';
-      b.style.color = 'var(--color-text)';
-      b.style.borderColor = 'var(--color-border)';
-    });
+    return next;
   }
 
+  let selectedLivro = '';
+  const livroBtns = [...document.querySelectorAll('.livro-btn')];
+  livroBtns.forEach(btn => btn.addEventListener('click', () => {
+    selectedLivro = toggleSelBtn(livroBtns, btn.dataset.value);
+    document.getElementById('livro').value = selectedLivro;
+  }));
+
+  let modalidadeSel = '', formatoSel = '';
+  const modalidadeBtns = [...document.querySelectorAll('.modalidade-btn')];
+  const formatoBtns    = [...document.querySelectorAll('.formato-btn')];
+
+  modalidadeBtns.forEach(btn => btn.addEventListener('click', () => {
+    modalidadeSel = toggleSelBtn(modalidadeBtns, btn.dataset.value);
+    document.getElementById('formatoContainer').style.display = modalidadeSel ? 'block' : 'none';
+    if (!modalidadeSel) {
+      formatoSel = '';
+      formatoBtns.forEach(b => { b.classList.remove('active'); b.dataset._selected = ''; });
+    }
+    updateModalidade();
+  }));
+
+  formatoBtns.forEach(btn => btn.addEventListener('click', () => {
+    formatoSel = toggleSelBtn(formatoBtns, btn.dataset.value);
+    updateModalidade();
+  }));
+
   function updateModalidade() {
-    let val = '';
-    if (modalidadeSel && formatoSel) val = formatoSel + ' ' + modalidadeSel;
-    else if (modalidadeSel) val = modalidadeSel;
+    const val = modalidadeSel && formatoSel ? formatoSel + ' ' + modalidadeSel : modalidadeSel;
     document.getElementById('modalidade').value = val;
     const preview = document.getElementById('modalidadePreview');
-    if (val) {
-      preview.style.display = 'block';
-      document.getElementById('modalidadeText').textContent = val;
-    } else {
-      preview.style.display = 'none';
-    }
+    preview.style.display = val ? 'block' : 'none';
+    if (val) document.getElementById('modalidadeText').textContent = val;
   }
 
   function showToast(msg, isError) {
@@ -469,9 +438,8 @@
     setTimeout(() => t.classList.remove('show'), 3500);
   }
 
-  document.getElementById('leadForm').addEventListener('submit', async (e) => {
+  document.getElementById('leadForm').addEventListener('submit', async e => {
     e.preventDefault();
-
     const aluno = document.getElementById('aluno').value.trim();
     if (!aluno) {
       document.getElementById('alunoError').style.display = 'block';
@@ -480,38 +448,38 @@
     }
     document.getElementById('alunoError').style.display = 'none';
 
-    const btn = document.getElementById('submitBtn');
+    const btn     = document.getElementById('submitBtn');
     const btnText = document.getElementById('submitText');
     btn.disabled = true;
     btnText.innerHTML = '<span class="spinner"></span> Enviando...';
 
     const estado = document.getElementById('estado').value;
     const cidade = document.getElementById('cidade').value.trim();
-    const cidadeCompleta = [cidade, estado].filter(Boolean).join(' - ');
-
-    const payload = {
-      dataLead: document.getElementById('dataLead').value,
-      dataAulaDemo: document.getElementById('dataAulaDemo').value,
-      aluno: aluno,
-      livro: document.getElementById('livro').value,
-      horarioAulas: document.getElementById('horarioAulas').value,
-      modalidade: document.getElementById('modalidade').value,
-      observacao: document.getElementById('observacao').value.trim(),
-      professor: document.getElementById('professor').value,
-      cidade: cidadeCompleta
-    };
 
     try {
-      const configResp = await fetch('/api/config');
-      const config = await configResp.json();
+      const config     = await fetch('/api/config').then(r => r.json());
       const webhookUrl = config.n8n_webhook;
+      const sheetUrl   = config.sheet_url; // ✅ lê a sheet_url do config
 
       if (!webhookUrl) {
-        showToast('Webhook do n8n não configurado. Contate o administrador.', true);
+        showToast('Webhook do n8n não configurado.', true);
         btn.disabled = false;
         btnText.textContent = 'Enviar Lead';
         return;
       }
+
+      const payload = {
+        sheet_url:   sheetUrl,              // ✅ incluída no body
+        dataLead:    document.getElementById('dataLead').value,
+        dataAulaDemo:document.getElementById('dataAulaDemo').value,
+        aluno,
+        livro:       document.getElementById('livro').value,
+        horarioAulas:document.getElementById('horarioAulas').value,
+        modalidade:  document.getElementById('modalidade').value,
+        observacao:  document.getElementById('observacao').value.trim(),
+        professor:   document.getElementById('professor').value,
+        cidade:      [cidade, estado].filter(Boolean).join(' - ')
+      };
 
       const resp = await fetch(webhookUrl, {
         method: 'POST',
@@ -524,8 +492,8 @@
         e.target.reset();
         selectedLivro = ''; modalidadeSel = ''; formatoSel = '';
         selectedCells.clear();
-        document.querySelectorAll('.livro-btn, .modalidade-btn, .formato-btn').forEach(b => {
-          b.style.background = 'none'; b.style.color = ''; b.style.borderColor = 'var(--color-border)';
+        [...livroBtns, ...modalidadeBtns, ...formatoBtns].forEach(b => {
+          b.classList.remove('active'); b.dataset._selected = '';
         });
         document.getElementById('formatoContainer').style.display = 'none';
         document.getElementById('modalidadePreview').style.display = 'none';
@@ -536,7 +504,7 @@
       } else {
         showToast('Erro ao enviar. Tente novamente.', true);
       }
-    } catch(err) {
+    } catch {
       showToast('Erro de conexão. Verifique a rede.', true);
     }
 
