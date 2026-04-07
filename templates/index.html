@@ -1,0 +1,548 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+  <title>Cadastro de Lead</title>
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300..700&display=swap" rel="stylesheet">
+  <style type="text/tailwindcss">
+    @theme {
+      --font-body: 'Inter', 'Helvetica Neue', sans-serif;
+      --color-primary: #01696f;
+      --color-primary-hover: #0c4e54;
+      --color-bg: #f7f6f2;
+      --color-surface: #f9f8f5;
+      --color-border: #d4d1ca;
+      --color-text: #28251d;
+      --color-text-muted: #7a7974;
+      --color-error: #a12c7b;
+    }
+
+    [data-theme="dark"] {
+      --color-bg: #171614;
+      --color-surface: #1c1b19;
+      --color-border: #393836;
+      --color-text: #cdccca;
+      --color-text-muted: #797876;
+      --color-primary: #4f98a3;
+      --color-primary-hover: #227f8b;
+    }
+  </style>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { -webkit-text-size-adjust: none; scroll-behavior: smooth; }
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: var(--color-bg, #f7f6f2);
+      color: var(--color-text, #28251d);
+      min-height: 100dvh;
+      font-size: 16px;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+    input, select, textarea, button { font: inherit; color: inherit; }
+    :focus-visible { outline: 2px solid var(--color-primary); outline-offset: 3px; border-radius: 6px; }
+
+    input[type="date"]::-webkit-calendar-picker-indicator {
+      cursor: pointer;
+      opacity: 0.6;
+      filter: invert(0);
+    }
+    [data-theme="dark"] input[type="date"]::-webkit-calendar-picker-indicator {
+      filter: invert(1);
+    }
+
+    .schedule-cell {
+      cursor: pointer;
+      user-select: none;
+      transition: background 150ms, color 150ms;
+    }
+    .schedule-cell.selected {
+      background-color: var(--color-primary, #01696f) !important;
+      color: white !important;
+      font-weight: 600;
+    }
+    .schedule-cell:active { opacity: 0.8; }
+
+    .toast {
+      position: fixed;
+      bottom: 1.5rem;
+      left: 50%;
+      transform: translateX(-50%) translateY(100px);
+      background: var(--color-primary);
+      color: white;
+      padding: 0.75rem 1.5rem;
+      border-radius: 9999px;
+      font-size: 0.875rem;
+      font-weight: 500;
+      z-index: 9999;
+      transition: transform 300ms cubic-bezier(0.16,1,0.3,1), opacity 300ms;
+      opacity: 0;
+      white-space: nowrap;
+    }
+    .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+    .toast.error { background: var(--color-error, #a12c7b); }
+
+    .spinner {
+      width: 18px; height: 18px;
+      border: 2px solid rgba(255,255,255,0.3);
+      border-top-color: white;
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+      display: inline-block;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .field-group { position: relative; }
+
+    .section-card {
+      background: var(--color-surface, #f9f8f5);
+      border: 1px solid var(--color-border, #d4d1ca);
+      border-radius: 12px;
+      padding: 1.25rem;
+    }
+
+    [data-theme="dark"] .section-card { background: #1c1b19; border-color: #393836; }
+    [data-theme="dark"] input, [data-theme="dark"] select, [data-theme="dark"] textarea {
+      background: #22211f !important;
+      border-color: #393836 !important;
+    }
+    [data-theme="dark"] .schedule-header { background: #22211f; }
+    [data-theme="dark"] .schedule-body-cell { background: #1c1b19; }
+  </style>
+</head>
+<body class="pb-24">
+
+  <header style="background:var(--color-surface);border-bottom:1px solid var(--color-border);position:sticky;top:0;z-index:50;">
+    <div style="max-width:640px;margin:0 auto;padding:0.875rem 1rem;display:flex;align-items:center;justify-content:space-between;">
+      <div style="display:flex;align-items:center;gap:0.625rem;">
+        <svg width="28" height="28" viewBox="0 0 28 28" fill="none" aria-label="Logo">
+          <rect width="28" height="28" rx="8" fill="var(--color-primary)"/>
+          <path d="M7 9h14M7 14h10M7 19h12" stroke="white" stroke-width="2" stroke-linecap="round"/>
+          <circle cx="21" cy="19" r="3.5" fill="white"/>
+          <path d="M19.5 19l1 1 1.5-1.5" stroke="var(--color-primary)" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <span style="font-weight:700;font-size:1rem;color:var(--color-text);">Controle de aula experimental</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:0.5rem;">
+        <button onclick="window.location='/admin'" style="font-size:0.8125rem;color:var(--color-text-muted);padding:0.4rem 0.875rem;border:1px solid var(--color-border);border-radius:8px;background:none;" aria-label="Admin">
+          ⚙ Admin
+        </button>
+        <button data-theme-toggle aria-label="Alternar tema" style="padding:0.4rem;border:none;background:none;color:var(--color-text-muted);border-radius:8px;line-height:0;">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main style="max-width:640px;margin:0 auto;padding:1.25rem 1rem;">
+    <h1 style="font-size:1.375rem;font-weight:700;margin-bottom:0.25rem;color:var(--color-text);">Novo Lead</h1>
+    <p style="font-size:0.875rem;color:var(--color-text-muted);margin-bottom:1.5rem;">Preencha os dados do aluno interessado.</p>
+
+    <form id="leadForm" novalidate>
+
+      <!-- Datas -->
+      <div class="section-card" style="margin-bottom:1rem;">
+        <p style="font-size:0.8125rem;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;color:var(--color-text-muted);margin-bottom:0.875rem;">Datas</p>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.875rem;">
+          <div>
+            <label for="dataLead" style="display:block;font-size:0.8125rem;font-weight:500;margin-bottom:0.375rem;">Data do Lead</label>
+            <input type="date" id="dataLead" name="dataLead"
+              style="width:100%;padding:0.625rem 0.75rem;border:1px solid var(--color-border);border-radius:8px;background:var(--color-surface);font-size:0.9375rem;">
+          </div>
+          <div>
+            <label for="dataAulaDemo" style="display:block;font-size:0.8125rem;font-weight:500;margin-bottom:0.375rem;">Aula Demo</label>
+            <input type="date" id="dataAulaDemo" name="dataAulaDemo"
+              style="width:100%;padding:0.625rem 0.75rem;border:1px solid var(--color-border);border-radius:8px;background:var(--color-surface);font-size:0.9375rem;">
+          </div>
+        </div>
+      </div>
+
+      <!-- Aluno -->
+      <div class="section-card" style="margin-bottom:1rem;">
+        <p style="font-size:0.8125rem;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;color:var(--color-text-muted);margin-bottom:0.875rem;">Aluno <span style="color:var(--color-error);">*</span></p>
+        <input type="text" id="aluno" name="aluno" placeholder="Nome do aluno" required
+          style="width:100%;padding:0.625rem 0.75rem;border:1px solid var(--color-border);border-radius:8px;background:var(--color-surface);font-size:0.9375rem;"
+          maxlength="100">
+        <p id="alunoError" style="font-size:0.8125rem;color:var(--color-error);margin-top:0.375rem;display:none;">Nome do aluno é obrigatório.</p>
+      </div>
+
+      <!-- Livro -->
+      <div class="section-card" style="margin-bottom:1rem;">
+        <p style="font-size:0.8125rem;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;color:var(--color-text-muted);margin-bottom:0.875rem;">Livro</p>
+        <div style="display:flex;gap:0.5rem;flex-wrap:wrap;">
+          <button type="button" class="livro-btn" data-value="1" style="padding:0.5rem 1rem;border:1px solid var(--color-border);border-radius:8px;background:none;font-size:0.875rem;color:var(--color-text-muted);">1</button>
+          <button type="button" class="livro-btn" data-value="2" style="padding:0.5rem 1rem;border:1px solid var(--color-border);border-radius:8px;background:none;font-size:0.875rem;color:var(--color-text-muted);">2</button>
+          <button type="button" class="livro-btn" data-value="3" style="padding:0.5rem 1rem;border:1px solid var(--color-border);border-radius:8px;background:none;font-size:0.875rem;color:var(--color-text-muted);">3</button>
+          <button type="button" class="livro-btn" data-value="4" style="padding:0.5rem 1rem;border:1px solid var(--color-border);border-radius:8px;background:none;font-size:0.875rem;color:var(--color-text-muted);">4</button>
+          <button type="button" class="livro-btn" data-value="5" style="padding:0.5rem 1rem;border:1px solid var(--color-border);border-radius:8px;background:none;font-size:0.875rem;color:var(--color-text-muted);">5</button>
+        </div>
+        <input type="hidden" id="livro" name="livro" value="">
+      </div>
+
+      <!-- Horário das Aulas -->
+      <div class="section-card" style="margin-bottom:1rem;">
+        <p style="font-size:0.8125rem;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;color:var(--color-text-muted);margin-bottom:0.875rem;">Horário das Aulas</p>
+        <p style="font-size:0.8125rem;color:var(--color-text-muted);margin-bottom:0.75rem;">Selecione os dias e horários de disponibilidade do aluno.</p>
+        <div style="overflow-x:auto;-webkit-overflow-scrolling:touch;">
+          <table id="scheduleTable" style="min-width:400px;border-collapse:collapse;width:100%;font-size:0.8125rem;">
+            <thead>
+              <tr>
+                <th style="padding:0.5rem 0.4rem;text-align:center;font-weight:600;color:var(--color-text-muted);background:var(--color-bg);border-radius:4px 0 0 4px;border:1px solid var(--color-border);width:56px;font-size:0.75rem;">Horário</th>
+                <th class="schedule-header" data-day="Seg" style="padding:0.5rem 0.25rem;text-align:center;border:1px solid var(--color-border);color:var(--color-text-muted);background:var(--color-bg);font-size:0.75rem;">Seg</th>
+                <th class="schedule-header" data-day="Ter" style="padding:0.5rem 0.25rem;text-align:center;border:1px solid var(--color-border);color:var(--color-text-muted);background:var(--color-bg);font-size:0.75rem;">Ter</th>
+                <th class="schedule-header" data-day="Qua" style="padding:0.5rem 0.25rem;text-align:center;border:1px solid var(--color-border);color:var(--color-text-muted);background:var(--color-bg);font-size:0.75rem;">Qua</th>
+                <th class="schedule-header" data-day="Qui" style="padding:0.5rem 0.25rem;text-align:center;border:1px solid var(--color-border);color:var(--color-text-muted);background:var(--color-bg);font-size:0.75rem;">Qui</th>
+                <th class="schedule-header" data-day="Sex" style="padding:0.5rem 0.25rem;text-align:center;border:1px solid var(--color-border);color:var(--color-text-muted);background:var(--color-bg);font-size:0.75rem;">Sex</th>
+                <th class="schedule-header" data-day="Sáb" style="padding:0.5rem 0.25rem;text-align:center;border:1px solid var(--color-border);color:var(--color-text-muted);background:var(--color-bg);font-size:0.75rem;">Sáb</th>
+                <th class="schedule-header" data-day="Dom" style="padding:0.5rem 0.25rem;text-align:center;border:1px solid var(--color-border);color:var(--color-text-muted);background:var(--color-bg);font-size:0.75rem;">Dom</th>
+              </tr>
+            </thead>
+            <tbody id="scheduleBody"></tbody>
+          </table>
+        </div>
+        <div style="margin-top:0.75rem;padding:0.625rem 0.75rem;background:var(--color-bg);border-radius:8px;border:1px solid var(--color-border);min-height:2.5rem;">
+          <span id="scheduleSummary" style="font-size:0.8125rem;color:var(--color-text-muted);">Nenhum horário selecionado</span>
+        </div>
+        <input type="hidden" id="horarioAulas" name="horarioAulas" value="">
+      </div>
+
+      <!-- Modalidade -->
+      <div class="section-card" style="margin-bottom:1rem;">
+        <p style="font-size:0.8125rem;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;color:var(--color-text-muted);margin-bottom:0.875rem;">Modalidade</p>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.5rem;margin-bottom:0.875rem;">
+          <button type="button" class="modalidade-btn" data-value="Online"
+            style="padding:0.625rem;border:1px solid var(--color-border);border-radius:8px;background:none;font-size:0.875rem;text-align:center;">
+            🌐 Online
+          </button>
+          <button type="button" class="modalidade-btn" data-value="Presencial"
+            style="padding:0.625rem;border:1px solid var(--color-border);border-radius:8px;background:none;font-size:0.875rem;text-align:center;">
+            🏫 Presencial
+          </button>
+        </div>
+        <div id="formatoContainer" style="display:none;">
+          <p style="font-size:0.8125rem;color:var(--color-text-muted);margin-bottom:0.5rem;">Formato da turma:</p>
+          <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:0.5rem;">
+            <button type="button" class="formato-btn" data-value="Individual VIP"
+              style="padding:0.5rem 0.25rem;border:1px solid var(--color-border);border-radius:8px;background:none;font-size:0.8125rem;text-align:center;">
+              👤 VIP
+            </button>
+            <button type="button" class="formato-btn" data-value="Dupla"
+              style="padding:0.5rem 0.25rem;border:1px solid var(--color-border);border-radius:8px;background:none;font-size:0.8125rem;text-align:center;">
+              👥 Dupla
+            </button>
+            <button type="button" class="formato-btn" data-value="Trio"
+              style="padding:0.5rem 0.25rem;border:1px solid var(--color-border);border-radius:8px;background:none;font-size:0.8125rem;text-align:center;">
+              👨‍👩‍👦 Trio
+            </button>
+            <button type="button" class="formato-btn" data-value="Quarteto"
+              style="padding:0.5rem 0.25rem;border:1px solid var(--color-border);border-radius:8px;background:none;font-size:0.8125rem;text-align:center;">
+              🏘 Quarteto
+            </button>
+            <button type="button" class="formato-btn" data-value="Quinteto"
+              style="padding:0.5rem 0.25rem;border:1px solid var(--color-border);border-radius:8px;background:none;font-size:0.8125rem;text-align:center;">
+              🏟 Quinteto
+            </button>
+          </div>
+        </div>
+        <div id="modalidadePreview" style="margin-top:0.75rem;display:none;">
+          <span style="font-size:0.8125rem;color:var(--color-text-muted);">Selecionado: </span>
+          <span id="modalidadeText" style="font-size:0.875rem;font-weight:600;color:var(--color-primary);"></span>
+        </div>
+        <input type="hidden" id="modalidade" name="modalidade" value="">
+      </div>
+
+      <!-- Observação -->
+      <div class="section-card" style="margin-bottom:1rem;">
+        <label for="observacao" style="display:block;font-size:0.8125rem;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;color:var(--color-text-muted);margin-bottom:0.875rem;">Observação</label>
+        <textarea id="observacao" name="observacao" rows="3" placeholder="Informações adicionais sobre o aluno como horários irregulares, etc..."
+          style="width:100%;padding:0.625rem 0.75rem;border:1px solid var(--color-border);border-radius:8px;background:var(--color-surface);font-size:0.9375rem;resize:none;line-height:1.5;" maxlength="500"></textarea>
+      </div>
+
+      <!-- Professor -->
+      <div class="section-card" style="margin-bottom:1rem;">
+        <label for="professor" style="display:block;font-size:0.8125rem;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;color:var(--color-text-muted);margin-bottom:0.875rem;">Professor</label>
+        <select id="professor" name="professor"
+          style="width:100%;padding:0.625rem 0.75rem;border:1px solid var(--color-border);border-radius:8px;background:var(--color-surface);font-size:0.9375rem;appearance:auto;">
+          <option value="">Selecione um professor</option>
+          {% for prof in professors %}
+          <option value="{{ prof }}">{{ prof }}</option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <!-- Cidade -->
+      <div class="section-card" style="margin-bottom:1.5rem;">
+        <p style="font-size:0.8125rem;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;color:var(--color-text-muted);margin-bottom:0.875rem;">Cidade</p>
+        <div style="display:grid;grid-template-columns:auto 1fr;gap:0.625rem;align-items:start;">
+          <div>
+            <label for="estado" style="display:block;font-size:0.75rem;color:var(--color-text-muted);margin-bottom:0.375rem;">Estado</label>
+            <select id="estado" name="estado"
+              style="padding:0.625rem 0.5rem;border:1px solid var(--color-border);border-radius:8px;background:var(--color-surface);font-size:0.9375rem;appearance:auto;width:80px;">
+              <option value="">UF</option>
+              <option>AC</option><option>AL</option><option>AP</option><option>AM</option>
+              <option>BA</option><option>CE</option><option>DF</option><option>ES</option>
+              <option>GO</option><option>MA</option><option>MT</option><option>MS</option>
+              <option>MG</option><option>PA</option><option>PB</option><option>PR</option>
+              <option>PE</option><option>PI</option><option>RJ</option><option>RN</option>
+              <option>RS</option><option>RO</option><option>RR</option><option>SC</option>
+              <option>SP</option><option>SE</option><option>TO</option>
+            </select>
+          </div>
+          <div>
+            <label for="cidade" style="display:block;font-size:0.75rem;color:var(--color-text-muted);margin-bottom:0.375rem;">Cidade</label>
+            <input type="text" id="cidade" name="cidade" placeholder="Ex: Brasília"
+              style="width:100%;padding:0.625rem 0.75rem;border:1px solid var(--color-border);border-radius:8px;background:var(--color-surface);font-size:0.9375rem;"
+              maxlength="60">
+          </div>
+        </div>
+      </div>
+
+      <!-- Submit -->
+      <button type="submit" id="submitBtn"
+        style="width:100%;padding:0.875rem;background:var(--color-primary);color:white;border:none;border-radius:12px;font-size:1rem;font-weight:600;display:flex;align-items:center;justify-content:center;gap:0.5rem;min-height:52px;touch-action:manipulation;">
+        <span id="submitText">Enviar Lead</span>
+      </button>
+
+    </form>
+  </main>
+
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+  <script>
+  (function(){
+    const t = document.querySelector('[data-theme-toggle]');
+    const r = document.documentElement;
+    let d = matchMedia('(prefers-color-scheme:dark)').matches ? 'dark' : 'light';
+    r.setAttribute('data-theme', d);
+    if(t) t.addEventListener('click', () => {
+      d = d === 'dark' ? 'light' : 'dark';
+      r.setAttribute('data-theme', d);
+    });
+  })();
+
+  const hours = ['07h','08h','09h','10h','11h','12h','13h','14h','15h','16h','17h','18h','19h','20h','21h','22h'];
+  const days = ['Seg','Ter','Qua','Qui','Sex','Sáb','Dom'];
+  const selectedCells = new Set();
+
+  function buildScheduleTable() {
+    const tbody = document.getElementById('scheduleBody');
+    hours.forEach(h => {
+      const tr = document.createElement('tr');
+      const th = document.createElement('td');
+      th.textContent = h;
+      th.style.cssText = 'padding:0.4rem;text-align:center;font-size:0.75rem;color:var(--color-text-muted);border:1px solid var(--color-border);white-space:nowrap;';
+      tr.appendChild(th);
+      days.forEach(d => {
+        const td = document.createElement('td');
+        td.className = 'schedule-cell schedule-body-cell';
+        td.dataset.hour = h;
+        td.dataset.day = d;
+        td.style.cssText = 'padding:0.5rem 0.25rem;text-align:center;border:1px solid var(--color-border);border-radius:4px;min-width:36px;';
+        td.textContent = '·';
+        td.addEventListener('click', () => toggleCell(td, h, d));
+        td.addEventListener('touchend', (e) => { e.preventDefault(); toggleCell(td, h, d); });
+        tr.appendChild(td);
+      });
+      tbody.appendChild(tr);
+    });
+  }
+
+  function toggleCell(td, h, d) {
+    const key = d + ':' + h;
+    if (selectedCells.has(key)) {
+      selectedCells.delete(key);
+      td.classList.remove('selected');
+      td.textContent = '·';
+    } else {
+      selectedCells.add(key);
+      td.classList.add('selected');
+      td.textContent = '✓';
+    }
+    updateScheduleSummary();
+  }
+
+  function updateScheduleSummary() {
+    const byDay = {};
+    selectedCells.forEach(k => {
+      const [d, h] = k.split(':');
+      if (!byDay[d]) byDay[d] = [];
+      byDay[d].push(h);
+    });
+    const parts = days.filter(d => byDay[d]).map(d => d + ' ' + byDay[d].join('/'));
+    const summary = parts.length ? parts.join(' | ') : 'Nenhum horário selecionado';
+    document.getElementById('scheduleSummary').textContent = summary;
+    document.getElementById('horarioAulas').value = parts.join(', ');
+  }
+
+  buildScheduleTable();
+
+  let selectedLivro = '';
+  document.querySelectorAll('.livro-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      selectedLivro = selectedLivro === btn.dataset.value ? '' : btn.dataset.value;
+      document.querySelectorAll('.livro-btn').forEach(b => {
+        if (b.dataset.value === selectedLivro) {
+          b.style.background = 'var(--color-primary)';
+          b.style.color = 'white';
+          b.style.borderColor = 'var(--color-primary)';
+        } else {
+          b.style.background = 'none';
+          b.style.color = 'var(--color-text-muted)';
+          b.style.borderColor = 'var(--color-border)';
+        }
+      });
+      document.getElementById('livro').value = selectedLivro;
+    });
+  });
+
+  let modalidadeSel = '', formatoSel = '';
+
+  document.querySelectorAll('.modalidade-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      modalidadeSel = modalidadeSel === btn.dataset.value ? '' : btn.dataset.value;
+      document.querySelectorAll('.modalidade-btn').forEach(b => {
+        if (b.dataset.value === modalidadeSel) {
+          b.style.background = 'var(--color-primary)';
+          b.style.color = 'white';
+          b.style.borderColor = 'var(--color-primary)';
+        } else {
+          b.style.background = 'none';
+          b.style.color = 'var(--color-text)';
+          b.style.borderColor = 'var(--color-border)';
+        }
+      });
+      document.getElementById('formatoContainer').style.display = modalidadeSel ? 'block' : 'none';
+      if (!modalidadeSel) { formatoSel = ''; resetFormatos(); }
+      updateModalidade();
+    });
+  });
+
+  document.querySelectorAll('.formato-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      formatoSel = formatoSel === btn.dataset.value ? '' : btn.dataset.value;
+      document.querySelectorAll('.formato-btn').forEach(b => {
+        if (b.dataset.value === formatoSel) {
+          b.style.background = 'var(--color-primary)';
+          b.style.color = 'white';
+          b.style.borderColor = 'var(--color-primary)';
+        } else {
+          b.style.background = 'none';
+          b.style.color = 'var(--color-text)';
+          b.style.borderColor = 'var(--color-border)';
+        }
+      });
+      updateModalidade();
+    });
+  });
+
+  function resetFormatos() {
+    document.querySelectorAll('.formato-btn').forEach(b => {
+      b.style.background = 'none';
+      b.style.color = 'var(--color-text)';
+      b.style.borderColor = 'var(--color-border)';
+    });
+  }
+
+  function updateModalidade() {
+    let val = '';
+    if (modalidadeSel && formatoSel) val = formatoSel + ' ' + modalidadeSel;
+    else if (modalidadeSel) val = modalidadeSel;
+    document.getElementById('modalidade').value = val;
+    const preview = document.getElementById('modalidadePreview');
+    if (val) {
+      preview.style.display = 'block';
+      document.getElementById('modalidadeText').textContent = val;
+    } else {
+      preview.style.display = 'none';
+    }
+  }
+
+  function showToast(msg, isError) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.className = 'toast' + (isError ? ' error' : '');
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 3500);
+  }
+
+  document.getElementById('leadForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    const aluno = document.getElementById('aluno').value.trim();
+    if (!aluno) {
+      document.getElementById('alunoError').style.display = 'block';
+      document.getElementById('aluno').focus();
+      return;
+    }
+    document.getElementById('alunoError').style.display = 'none';
+
+    const btn = document.getElementById('submitBtn');
+    const btnText = document.getElementById('submitText');
+    btn.disabled = true;
+    btnText.innerHTML = '<span class="spinner"></span> Enviando...';
+
+    const estado = document.getElementById('estado').value;
+    const cidade = document.getElementById('cidade').value.trim();
+    const cidadeCompleta = [cidade, estado].filter(Boolean).join(' - ');
+
+    const payload = {
+      dataLead: document.getElementById('dataLead').value,
+      dataAulaDemo: document.getElementById('dataAulaDemo').value,
+      aluno: aluno,
+      livro: document.getElementById('livro').value,
+      horarioAulas: document.getElementById('horarioAulas').value,
+      modalidade: document.getElementById('modalidade').value,
+      observacao: document.getElementById('observacao').value.trim(),
+      professor: document.getElementById('professor').value,
+      cidade: cidadeCompleta
+    };
+
+    try {
+      const configResp = await fetch('/api/config');
+      const config = await configResp.json();
+      const webhookUrl = config.n8n_webhook;
+
+      if (!webhookUrl) {
+        showToast('Webhook do n8n não configurado. Contate o administrador.', true);
+        btn.disabled = false;
+        btnText.textContent = 'Enviar Lead';
+        return;
+      }
+
+      const resp = await fetch(webhookUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+
+      if (resp.ok) {
+        showToast('✓ Lead cadastrado com sucesso!', false);
+        e.target.reset();
+        selectedLivro = ''; modalidadeSel = ''; formatoSel = '';
+        selectedCells.clear();
+        document.querySelectorAll('.livro-btn, .modalidade-btn, .formato-btn').forEach(b => {
+          b.style.background = 'none'; b.style.color = ''; b.style.borderColor = 'var(--color-border)';
+        });
+        document.getElementById('formatoContainer').style.display = 'none';
+        document.getElementById('modalidadePreview').style.display = 'none';
+        document.querySelectorAll('.schedule-cell.selected').forEach(c => {
+          c.classList.remove('selected'); c.textContent = '·';
+        });
+        updateScheduleSummary();
+      } else {
+        showToast('Erro ao enviar. Tente novamente.', true);
+      }
+    } catch(err) {
+      showToast('Erro de conexão. Verifique a rede.', true);
+    }
+
+    btn.disabled = false;
+    btnText.textContent = 'Enviar Lead';
+  });
+  </script>
+</body>
+</html>

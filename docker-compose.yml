@@ -1,0 +1,22 @@
+version: "3.8"
+
+services:
+  leads-frontend:
+    build: .
+    container_name: leads-frontend
+    restart: unless-stopped
+    ports:
+      - "5000:5000"
+    volumes:
+      - leads_data:/data
+    environment:
+      - CONFIG_FILE=/data/config.json
+    networks:
+      - leads-net
+
+volumes:
+  leads_data:
+
+networks:
+  leads-net:
+    driver: bridge
