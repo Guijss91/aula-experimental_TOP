@@ -10,18 +10,30 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300..700&display=swap" rel="stylesheet">
   <style>
     :root {
-      --color-primary:        #4f98a3;
-      --color-primary-hover:  #227f8b;
-      --color-bg:             #171614;
-      --color-surface:        #1c1b19;
-      --color-surface-2:      #22211f;
-      --color-border:         #393836;
-      --color-border-strong:  #4a4947;
-      --color-text:           #ffffff;
-      --color-text-muted:     #a8a7a4;
-      --color-error:          #d163a7;
-      --color-btn-idle-bg:    #2a2927;
-      --color-btn-idle-border:#4a4947;
+      /* Cores da Bandeira dos EUA */
+      --color-usa-blue:       #3C3B6E;
+      --color-usa-red:        #B22234;
+      --color-white:          #FFFFFF;
+
+      /* Variáveis de Tema (Light Mode Moderno) */
+      --color-primary:        var(--color-usa-blue);
+      --color-primary-hover:  #2c2b53;
+      --color-accent:         var(--color-usa-red);
+      --color-bg:             #F3F4F6; /* Fundo cinza super claro */
+      --color-surface:        #FFFFFF; /* Cards em branco puro */
+      --color-surface-2:      #F8FAFC; /* Fundo secundário sutil para inputs */
+      --color-border:         #E2E8F0;
+      --color-border-strong:  #CBD5E1;
+      --color-text:           #1E293B; /* Texto bem escuro/quase preto */
+      --color-text-muted:     #64748B;
+      --color-error:          var(--color-usa-red);
+      --color-btn-idle-bg:    #FFFFFF;
+      --color-btn-idle-border:#CBD5E1;
+      
+      /* Sombras modernas */
+      --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+      --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+      
       --radius-sm: 6px;
       --radius-md: 8px;
       --radius-lg: 12px;
@@ -51,10 +63,14 @@
       border-radius: var(--radius-sm);
     }
 
+    /* Ajuste de calendário para o tema claro (removido o filtro invert) */
     input[type="date"]::-webkit-calendar-picker-indicator {
       cursor: pointer;
-      filter: invert(1);
       opacity: 0.6;
+      transition: opacity 150ms;
+    }
+    input[type="date"]::-webkit-calendar-picker-indicator:hover {
+      opacity: 1;
     }
 
     .section-card {
@@ -62,29 +78,34 @@
       border: 1px solid var(--color-border);
       border-radius: var(--radius-lg);
       padding: 1.25rem;
-      margin-bottom: 1rem;
+      margin-bottom: 1.25rem;
+      box-shadow: var(--shadow-sm);
     }
 
     .section-label {
       font-size: 0.8125rem;
-      font-weight: 600;
+      font-weight: 700;
       text-transform: uppercase;
       letter-spacing: 0.05em;
-      color: var(--color-text-muted);
+      color: var(--color-usa-blue); /* Destaque no azul americano */
       margin-bottom: 0.875rem;
     }
 
     .field-input {
       width: 100%;
       padding: 0.625rem 0.75rem;
-      border: 1px solid var(--color-border);
+      border: 1px solid var(--color-border-strong);
       border-radius: var(--radius-md);
       background: var(--color-surface-2);
       font-size: 0.9375rem;
       color: var(--color-text);
-      transition: border-color 150ms;
+      transition: border-color 150ms, box-shadow 150ms;
     }
-    .field-input:focus { border-color: var(--color-primary); outline: none; }
+    .field-input:focus { 
+      border-color: var(--color-primary); 
+      outline: none; 
+      box-shadow: 0 0 0 3px rgba(60, 59, 110, 0.15); /* Brilho azul */
+    }
 
     .sel-btn {
       background: var(--color-btn-idle-bg);
@@ -92,31 +113,37 @@
       border: 1.5px solid var(--color-btn-idle-border);
       border-radius: var(--radius-md);
       cursor: pointer;
-      transition: background 150ms, border-color 150ms, box-shadow 150ms;
+      transition: all 150ms ease-in-out;
       text-align: center;
+      font-weight: 500;
     }
     .sel-btn:hover {
-      background: #353432;
-      border-color: #5a5957;
+      background: var(--color-surface-2);
+      border-color: var(--color-primary);
     }
     .sel-btn.active {
       background: var(--color-primary) !important;
-      color: #fff !important;
+      color: var(--color-white) !important;
       border-color: var(--color-primary) !important;
+      box-shadow: 0 2px 4px rgba(60, 59, 110, 0.3);
     }
 
     .schedule-cell {
       cursor: pointer;
       user-select: none;
-      transition: background 150ms, color 150ms;
+      transition: background 150ms, color 150ms, transform 100ms;
       color: var(--color-text-muted);
+    }
+    .schedule-cell:hover {
+      background: var(--color-border);
     }
     .schedule-cell.selected {
       background: var(--color-primary) !important;
-      color: #fff !important;
+      color: var(--color-white) !important;
       font-weight: 600;
+      border-color: var(--color-primary) !important;
     }
-    .schedule-cell:active { opacity: 0.7; }
+    .schedule-cell:active { transform: scale(0.95); }
 
     .toast {
       position: fixed;
@@ -128,8 +155,9 @@
       padding: 0.75rem 1.5rem;
       border-radius: 9999px;
       font-size: 0.875rem;
-      font-weight: 500;
+      font-weight: 600;
       z-index: 9999;
+      box-shadow: var(--shadow-md);
       transition: transform 300ms cubic-bezier(0.16,1,0.3,1), opacity 300ms;
       opacity: 0;
       white-space: nowrap;
@@ -146,24 +174,74 @@
       display: inline-block;
     }
     @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* Estilo Especial do Botão de Envio */
+    .submit-btn {
+      width: 100%;
+      padding: 0.875rem;
+      background: var(--color-primary);
+      color: var(--color-white);
+      border: none;
+      border-radius: var(--radius-lg);
+      font-size: 1rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      min-height: 52px;
+      touch-action: manipulation;
+      cursor: pointer;
+      transition: background 200ms, transform 150ms, box-shadow 150ms;
+      box-shadow: 0 4px 6px rgba(60, 59, 110, 0.2);
+    }
+    .submit-btn:hover:not(:disabled) {
+      background: var(--color-accent); /* Ao passar o mouse, muda para vermelho EUA */
+      transform: translateY(-2px);
+      box-shadow: 0 6px 10px rgba(178, 34, 52, 0.3);
+    }
+    .submit-btn:active:not(:disabled) {
+      transform: translateY(0);
+    }
+    .submit-btn:disabled {
+      opacity: 0.7;
+      cursor: not-allowed;
+    }
   </style>
 </head>
 <body style="padding-bottom:6rem;">
 
+  <!-- Detalhe com a bandeira dos eua (linha fina no topo) -->
+  <div style="display:flex; height:4px; width:100%; position:fixed; top:0; left:0; z-index:51;">
+    <div style="flex:1; background-color: var(--color-usa-blue);"></div>
+    <div style="flex:1; background-color: var(--color-usa-red);"></div>
+  </div>
+
   <!-- Header -->
-  <header style="background:var(--color-surface);border-bottom:1px solid var(--color-border);position:sticky;top:0;z-index:50;">
+  <header style="background:var(--color-surface);border-bottom:1px solid var(--color-border);position:sticky;top:4px;z-index:50;box-shadow:var(--shadow-sm);">
     <div style="max-width:640px;margin:0 auto;padding:0.875rem 1rem;display:flex;align-items:center;justify-content:space-between;">
       <div style="display:flex;align-items:center;gap:0.625rem;">
-        <svg width="28" height="28" viewBox="0 0 28 28" fill="none" aria-label="Logo">
+        
+        <!-- INÍCIO DA LOGO -->
+        <!-- Substitua 'sua-logo.png' pelo caminho ou URL da sua imagem. Se der erro, ele exibe um quadrado azul -->
+        <img src="sua-logo.png" alt="Logo" style="height: 32px; width: auto; max-width: 80px; object-fit: contain;" 
+             onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+        
+        <!-- Ícone alternativo que só aparece se a logo acima falhar -->
+        <svg style="display:none;" width="28" height="28" viewBox="0 0 28 28" fill="none" aria-label="Logo Fallback">
           <rect width="28" height="28" rx="8" fill="var(--color-primary)"/>
           <path d="M7 9h14M7 14h10M7 19h12" stroke="white" stroke-width="2" stroke-linecap="round"/>
           <circle cx="21" cy="19" r="3.5" fill="white"/>
           <path d="M19.5 19l1 1 1.5-1.5" stroke="var(--color-primary)" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
         </svg>
-        <span style="font-weight:700;font-size:1rem;">Controle de aula experimental</span>
+        <!-- FIM DA LOGO -->
+
+        <span style="font-weight:800;font-size:1rem;color:var(--color-usa-blue);">Controle de aula experimental</span>
       </div>
       <button onclick="window.location='/admin'"
-        style="font-size:0.8125rem;color:var(--color-text-muted);padding:0.4rem 0.875rem;border:1px solid var(--color-border);border-radius:var(--radius-md);background:none;cursor:pointer;"
+        style="font-size:0.8125rem;font-weight:600;color:var(--color-usa-blue);padding:0.4rem 0.875rem;border:1.5px solid var(--color-border);border-radius:var(--radius-md);background:var(--color-surface-2);cursor:pointer;transition:all 150ms;"
+        onmouseover="this.style.borderColor='var(--color-usa-blue)';this.style.backgroundColor='white';"
+        onmouseout="this.style.borderColor='var(--color-border)';this.style.backgroundColor='var(--color-surface-2)';"
         aria-label="Admin">
         ⚙ Admin
       </button>
@@ -171,22 +249,22 @@
   </header>
 
   <!-- Main -->
-  <main style="max-width:640px;margin:0 auto;padding:1.25rem 1rem;">
-    <h1 style="font-size:1.375rem;font-weight:700;margin-bottom:0.25rem;">Novo Lead</h1>
+  <main style="max-width:640px;margin:0 auto;padding:1.5rem 1rem;">
+    <h1 style="font-size:1.5rem;font-weight:800;margin-bottom:0.25rem;color:var(--color-text);">Novo Lead</h1>
     <p style="font-size:0.875rem;color:var(--color-text-muted);margin-bottom:1.5rem;">Preencha os dados do aluno interessado.</p>
 
     <form id="leadForm" novalidate>
 
-      <!-- s -->
+      <!-- Datas -->
       <div class="section-card">
         <p class="section-label">datas</p>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.875rem;">
           <div>
-            <label for="dataLead" style="display:block;font-size:0.8125rem;font-weight:500;margin-bottom:0.375rem;">Data que foi recebido o Lead</label>
+            <label for="dataLead" style="display:block;font-size:0.8125rem;font-weight:600;margin-bottom:0.375rem;color:var(--color-text);">Data que foi recebido o Lead</label>
             <input type="date" id="dataLead" name="dataLead" class="field-input">
           </div>
           <div>
-            <label for="dataAulaDemo" style="display:block;font-size:0.8125rem;font-weight:500;margin-bottom:0.375rem;">Data da Aula Demo</label>
+            <label for="dataAulaDemo" style="display:block;font-size:0.8125rem;font-weight:600;margin-bottom:0.375rem;color:var(--color-text);">Data da Aula Demo</label>
             <input type="date" id="dataAulaDemo" name="dataAulaDemo" class="field-input">
           </div>
         </div>
@@ -195,9 +273,9 @@
       <!-- Aluno -->
       <div class="section-card">
         <p class="section-label">Aluno <span style="color:var(--color-error);">*</span></p>
-        <input type="text" id="aluno" name="aluno" placeholder="Nome do aluno" required
+        <input type="text" id="aluno" name="aluno" placeholder="Nome completo do aluno" required
           class="field-input" maxlength="100">
-        <p id="alunoError" style="font-size:0.8125rem;color:var(--color-error);margin-top:0.375rem;display:none;">
+        <p id="alunoError" style="font-size:0.8125rem;color:var(--color-error);font-weight:500;margin-top:0.375rem;display:none;">
           Nome do aluno é obrigatório.
         </p>
       </div>
@@ -206,11 +284,11 @@
       <div class="section-card">
         <p class="section-label">Livro</p>
         <div style="display:flex;gap:0.5rem;flex-wrap:wrap;">
-          <button type="button" class="sel-btn livro-btn" data-value="1" style="padding:0.5rem 1rem;font-size:0.875rem;">1</button>
-          <button type="button" class="sel-btn livro-btn" data-value="2" style="padding:0.5rem 1rem;font-size:0.875rem;">2</button>
-          <button type="button" class="sel-btn livro-btn" data-value="3" style="padding:0.5rem 1rem;font-size:0.875rem;">3</button>
-          <button type="button" class="sel-btn livro-btn" data-value="4" style="padding:0.5rem 1rem;font-size:0.875rem;">4</button>
-          <button type="button" class="sel-btn livro-btn" data-value="5" style="padding:0.5rem 1rem;font-size:0.875rem;">5</button>
+          <button type="button" class="sel-btn livro-btn" data-value="1" style="padding:0.5rem 1.25rem;font-size:0.9375rem;">1</button>
+          <button type="button" class="sel-btn livro-btn" data-value="2" style="padding:0.5rem 1.25rem;font-size:0.9375rem;">2</button>
+          <button type="button" class="sel-btn livro-btn" data-value="3" style="padding:0.5rem 1.25rem;font-size:0.9375rem;">3</button>
+          <button type="button" class="sel-btn livro-btn" data-value="4" style="padding:0.5rem 1.25rem;font-size:0.9375rem;">4</button>
+          <button type="button" class="sel-btn livro-btn" data-value="5" style="padding:0.5rem 1.25rem;font-size:0.9375rem;">5</button>
         </div>
         <input type="hidden" id="livro" name="livro" value="">
       </div>
@@ -225,7 +303,7 @@
           <table id="scheduleTable" style="min-width:400px;border-collapse:collapse;width:100%;font-size:0.8125rem;">
             <thead>
               <tr>
-                <th style="padding:0.5rem 0.4rem;text-align:center;font-weight:600;color:var(--color-text-muted);background:var(--color-bg);border:1px solid var(--color-border);width:56px;font-size:0.75rem;">Horário</th>
+                <th style="padding:0.5rem 0.4rem;text-align:center;font-weight:700;color:var(--color-text-muted);background:var(--color-bg);border:1px solid var(--color-border);width:56px;font-size:0.75rem;">Horário</th>
                 <th style="padding:0.5rem 0.25rem;text-align:center;border:1px solid var(--color-border);color:var(--color-text-muted);background:var(--color-surface-2);font-size:0.75rem;">Seg</th>
                 <th style="padding:0.5rem 0.25rem;text-align:center;border:1px solid var(--color-border);color:var(--color-text-muted);background:var(--color-surface-2);font-size:0.75rem;">Ter</th>
                 <th style="padding:0.5rem 0.25rem;text-align:center;border:1px solid var(--color-border);color:var(--color-text-muted);background:var(--color-surface-2);font-size:0.75rem;">Qua</th>
@@ -238,8 +316,8 @@
             <tbody id="scheduleBody"></tbody>
           </table>
         </div>
-        <div style="margin-top:0.75rem;padding:0.625rem 0.75rem;background:var(--color-surface-2);border-radius:var(--radius-md);border:1px solid var(--color-border);min-height:2.5rem;">
-          <span id="scheduleSummary" style="font-size:0.8125rem;color:var(--color-text-muted);">Nenhum horário selecionado</span>
+        <div style="margin-top:0.75rem;padding:0.625rem 0.75rem;background:var(--color-surface-2);border-radius:var(--radius-md);border:1px solid var(--color-border);min-height:2.5rem;display:flex;align-items:center;">
+          <span id="scheduleSummary" style="font-size:0.8125rem;color:var(--color-text-muted);font-weight:500;">Nenhum horário selecionado</span>
         </div>
         <input type="hidden" id="horarioAulas" name="horarioAulas" value="">
       </div>
@@ -247,14 +325,14 @@
       <!-- Modalidade -->
       <div class="section-card">
         <p class="section-label">Modalidade</p>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.5rem;margin-bottom:0.875rem;">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.75rem;margin-bottom:1rem;">
           <button type="button" class="sel-btn modalidade-btn" data-value="Online"
-            style="padding:0.625rem;font-size:0.875rem;">🌐 Online</button>
+            style="padding:0.75rem;font-size:0.9375rem;">🌐 Online</button>
           <button type="button" class="sel-btn modalidade-btn" data-value="Presencial"
-            style="padding:0.625rem;font-size:0.875rem;">🏫 Presencial</button>
+            style="padding:0.75rem;font-size:0.9375rem;">🏫 Presencial</button>
         </div>
-        <div id="formatoContainer" style="display:none;">
-          <p style="font-size:0.8125rem;color:var(--color-text-muted);margin-bottom:0.5rem;">Formato da turma:</p>
+        <div id="formatoContainer" style="display:none; padding-top:0.5rem; border-top:1px dashed var(--color-border);">
+          <p style="font-size:0.8125rem;font-weight:600;color:var(--color-text);margin-bottom:0.625rem;margin-top:0.5rem;">Formato da turma:</p>
           <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:0.5rem;">
             <button type="button" class="sel-btn formato-btn" data-value="Individual VIP"
               style="padding:0.5rem 0.25rem;font-size:0.8125rem;">👤 VIP</button>
@@ -268,9 +346,9 @@
               style="padding:0.5rem 0.25rem;font-size:0.8125rem;">🏟 Quinteto</button>
           </div>
         </div>
-        <div id="modalidadePreview" style="margin-top:0.75rem;display:none;">
+        <div id="modalidadePreview" style="margin-top:0.75rem;display:none;background:var(--color-surface-2);padding:0.5rem;border-radius:var(--radius-sm);border:1px solid var(--color-border);">
           <span style="font-size:0.8125rem;color:var(--color-text-muted);">Selecionado: </span>
-          <span id="modalidadeText" style="font-size:0.875rem;font-weight:600;color:var(--color-primary);"></span>
+          <span id="modalidadeText" style="font-size:0.875rem;font-weight:700;color:var(--color-primary);"></span>
         </div>
         <input type="hidden" id="modalidade" name="modalidade" value="">
       </div>
@@ -280,13 +358,13 @@
         <label for="observacao" class="section-label" style="display:block;">Observação</label>
         <textarea id="observacao" name="observacao" rows="3"
           placeholder="Informações adicionais sobre o aluno como horários irregulares, etc..."
-          class="field-input" style="resize:none;line-height:1.5;" maxlength="500"></textarea>
+          class="field-input" style="resize:vertical;line-height:1.5;" maxlength="500"></textarea>
       </div>
 
       <!-- Professor -->
       <div class="section-card">
         <label for="professor" class="section-label" style="display:block;">Professor</label>
-        <select id="professor" name="professor" class="field-input" style="appearance:auto;">
+        <select id="professor" name="professor" class="field-input" style="appearance:auto; background-color: var(--color-surface-2);">
           <option value="">Selecione um professor</option>
           {% for prof in professors %}
           <option value="{{ prof }}">{{ prof }}</option>
@@ -295,11 +373,11 @@
       </div>
 
       <!-- Cidade -->
-      <div class="section-card" style="margin-bottom:1.5rem;">
+      <div class="section-card" style="margin-bottom:2rem;">
         <p class="section-label">Cidade</p>
-        <div style="display:grid;grid-template-columns:auto 1fr;gap:0.625rem;align-items:start;">
+        <div style="display:grid;grid-template-columns:auto 1fr;gap:0.75rem;align-items:start;">
           <div>
-            <label for="estado" style="display:block;font-size:0.75rem;color:var(--color-text-muted);margin-bottom:0.375rem;">Estado</label>
+            <label for="estado" style="display:block;font-size:0.75rem;font-weight:600;color:var(--color-text);margin-bottom:0.375rem;">Estado</label>
             <select id="estado" name="estado" class="field-input" style="appearance:auto;width:80px;padding:0.625rem 0.5rem;">
               <option value="">UF</option>
               <option>AC</option><option>AL</option><option>AP</option><option>AM</option>
@@ -312,7 +390,7 @@
             </select>
           </div>
           <div>
-            <label for="cidade" style="display:block;font-size:0.75rem;color:var(--color-text-muted);margin-bottom:0.375rem;">Cidade</label>
+            <label for="cidade" style="display:block;font-size:0.75rem;font-weight:600;color:var(--color-text);margin-bottom:0.375rem;">Cidade</label>
             <input type="text" id="cidade" name="cidade" placeholder="Ex: Brasília"
               class="field-input" maxlength="60">
           </div>
@@ -320,8 +398,7 @@
       </div>
 
       <!-- Submit -->
-      <button type="submit" id="submitBtn"
-        style="width:100%;padding:0.875rem;background:var(--color-primary);color:#fff;border:none;border-radius:var(--radius-lg);font-size:1rem;font-weight:600;display:flex;align-items:center;justify-content:center;gap:0.5rem;min-height:52px;touch-action:manipulation;cursor:pointer;transition:background 150ms;">
+      <button type="submit" id="submitBtn" class="submit-btn">
         <span id="submitText">Enviar Lead</span>
       </button>
 
@@ -341,7 +418,7 @@
       const tr = document.createElement('tr');
       const td0 = document.createElement('td');
       td0.textContent = h;
-      td0.style.cssText = 'padding:0.4rem;text-align:center;font-size:0.75rem;color:var(--color-text-muted);border:1px solid var(--color-border);white-space:nowrap;background:var(--color-bg);';
+      td0.style.cssText = 'padding:0.4rem;text-align:center;font-size:0.75rem;color:var(--color-text-muted);border:1px solid var(--color-border);white-space:nowrap;background:var(--color-bg);font-weight:500;';
       tr.appendChild(td0);
       days.forEach(d => {
         const td = document.createElement('td');
@@ -459,7 +536,7 @@
     try {
       const config     = await fetch('/api/config').then(r => r.json());
       const webhookUrl = config.n8n_webhook;
-      const sheetUrl   = config.sheet_url; // ✅ lê a sheet_url do config
+      const sheetUrl   = config.sheet_url;
 
       if (!webhookUrl) {
         showToast('Webhook do n8n não configurado.', true);
@@ -469,7 +546,7 @@
       }
 
       const payload = {
-        sheet_url:   sheetUrl,              // ✅ incluída no body
+        sheet_url:   sheetUrl,              
         dataLead:    document.getElementById('dataLead').value,
         dataAulaDemo:document.getElementById('dataAulaDemo').value,
         aluno,
