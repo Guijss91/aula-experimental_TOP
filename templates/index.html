@@ -278,16 +278,6 @@
       margin-bottom: 0.9rem;
     }
 
-    .section-label::before {
-      content: "";
-      width: 10px;
-      height: 10px;
-      border-radius: 999px;
-      background: linear-gradient(135deg, var(--blue), var(--red));
-      box-shadow: 0 0 0 4px rgba(31,78,216,0.08);
-      flex: 0 0 10px;
-    }
-
     .field-grid-city {
       display: grid;
       grid-template-columns: 88px 1fr;
@@ -296,7 +286,7 @@
     }
 
     .field-wrap {
-      min-width: 0;
+      min-width: fit-content;
     }
 
     .field-wrap label {
@@ -311,7 +301,7 @@
 
     .field-input {
       width: 100%;
-      min-width: 0;
+      min-width: fit-content;
       border: 1px solid var(--border);
       background: linear-gradient(180deg, #ffffff 0%, #f8fbff 100%);
       color: var(--text) !important;
@@ -551,7 +541,7 @@
       min-height: 58px;
       border: none;
       border-radius: 22px;
-      background: linear-gradient(135deg, var(--blue), var(--red));
+      background: linear-gradient(135deg, var(--blue), var(--blue));
       color: #fff;
       font-size: 1rem;
       font-weight: 800;
@@ -639,7 +629,7 @@
       <div class="brand">
         <div class="logo-wrap">
           <img
-            src="sua-logo.png"
+            src="https://top-english-minio.ryho2k.easypanel.host/typebot/topenglish%20logo.png"
             alt="Logo"
             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
           >
@@ -647,8 +637,8 @@
         </div>
 
         <div class="brand-text">
-          <div class="brand-kicker">Lead Form</div>
-          <div class="brand-title">Controle de aula experimental</div>
+          <div class="brand-kicker">Top English</div>
+          <div class="brand-title">Formulário de aula experimental</div>
         </div>
       </div>
 
@@ -666,9 +656,9 @@
   <main class="shell">
     <section class="hero">
       <div class="hero-card">
-        <div class="hero-chip">Formulário atualizado</div>
-        <h1 class="hero-title">Novo Lead</h1>
-        <p class="hero-text">Preencha os dados do aluno interessado com um fluxo rápido, visual moderno e foco em mobile.</p>
+        <div class="hero-chip">Campos com * são obrigatórios</div>
+        <h1 class="hero-title">Dados do Lead</h1>
+        <p class="hero-text">Preencha os dados do Lead e da aula experimental .</p>
       </div>
     </section>
 
@@ -680,12 +670,12 @@
 
         <div style="display: flex; flex-direction: column; gap: 0.85rem;">
           <div class="field-wrap">
-            <label for="dataLead">Data recebimento</label>
+            <label for="dataLead">Data de recebimento do lead</label>
             <input type="date" id="dataLead" name="dataLead" class="field-input">
           </div>
 
           <div class="field-wrap">
-            <label for="dataAulaDemo">Data Aula Demo</label>
+            <label for="dataAulaDemo">Data da aula experimental</label>
             <input type="date" id="dataAulaDemo" name="dataAulaDemo" class="field-input">
           </div>
         </div>
