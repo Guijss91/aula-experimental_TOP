@@ -664,7 +664,6 @@
 
     <form id="leadForm" novalidate class="form-stack">
 
-      <!-- Datas (Corrigidas para ficarem uma embaixo da outra) -->
       <section class="section-card">
         <p class="section-label">Datas</p>
 
@@ -681,7 +680,6 @@
         </div>
       </section>
 
-      <!-- Aluno -->
       <section class="section-card">
         <p class="section-label">Aluno <span style="color:var(--red)">*</span></p>
 
@@ -700,7 +698,6 @@
         </p>
       </section>
 
-      <!-- Livro -->
       <section class="section-card">
         <p class="section-label">Livro</p>
 
@@ -715,7 +712,6 @@
         <input type="hidden" id="livro" name="livro" value="">
       </section>
 
-      <!-- Horário das Aulas -->
       <section class="section-card">
         <p class="section-label">Horário das Aulas</p>
         <p class="subtle-text">Selecione os dias e horários de disponibilidade do aluno.</p>
@@ -747,7 +743,6 @@
         <input type="hidden" id="horarioAulas" name="horarioAulas" value="">
       </section>
 
-      <!-- Modalidade -->
       <section class="section-card">
         <p class="section-label">Modalidade</p>
 
@@ -770,7 +765,7 @@
         </div>
 
         <div id="formatoContainer" style="display:none;">
-          <p class="subtle-text">Formato da turma:</p>
+          <p class="subtle-text">Formato da turma: selecione um ou mais formatos.</p>
 
           <div class="option-grid-3">
             <button type="button" class="sel-btn formato-btn mini-option" data-value="Individual VIP">👤 VIP</button>
@@ -789,7 +784,6 @@
         <input type="hidden" id="modalidade" name="modalidade" value="">
       </section>
 
-      <!-- Observação -->
       <section class="section-card">
         <label for="observacao" class="section-label" style="display:block;">Observação</label>
 
@@ -803,7 +797,6 @@
         ></textarea>
       </section>
 
-      <!-- Professor -->
       <section class="section-card">
         <label for="professor" class="section-label" style="display:block;">Professor</label>
 
@@ -815,7 +808,6 @@
         </select>
       </section>
 
-      <!-- Cidade -->
       <section class="section-card">
         <p class="section-label">Cidade</p>
 
@@ -849,7 +841,6 @@
         </div>
       </section>
 
-      <!-- Submit -->
       <div class="submit-wrap">
         <div class="submit-shell">
           <button type="submit" id="submitBtn" class="submit-btn">
@@ -953,145 +944,11 @@
       document.getElementById('livro').value = selectedLivro;
     }));
 
-    let modalidadeSel = '', formatoSel = '';
+    let modalidadeSel = '';
+    let formatosSelecionados = [];
+
     const modalidadeBtns = [...document.querySelectorAll('.modalidade-btn')];
     const formatoBtns    = [...document.querySelectorAll('.formato-btn')];
 
     modalidadeBtns.forEach(btn => btn.addEventListener('click', () => {
-      modalidadeSel = toggleSelBtn(modalidadeBtns, btn.dataset.value);
-      document.getElementById('formatoContainer').style.display = modalidadeSel ? 'block' : 'none';
-
-      if (!modalidadeSel) {
-        formatoSel = '';
-        formatoBtns.forEach(b => {
-          b.classList.remove('active');
-          b.dataset._selected = '';
-        });
-      }
-
-      updateModalidade();
-    }));
-
-    formatoBtns.forEach(btn => btn.addEventListener('click', () => {
-      formatoSel = toggleSelBtn(formatoBtns, btn.dataset.value);
-      updateModalidade();
-    }));
-
-    function updateModalidade() {
-      const val = modalidadeSel && formatoSel
-        ? formatoSel + ' ' + modalidadeSel
-        : modalidadeSel;
-
-      document.getElementById('modalidade').value = val;
-
-      const preview = document.getElementById('modalidadePreview');
-      preview.style.display = val ? 'block' : 'none';
-
-      if (val) {
-        document.getElementById('modalidadeText').textContent = val;
-      }
-    }
-
-    function showToast(msg, isError) {
-      const t = document.getElementById('toast');
-      t.textContent = msg;
-      t.className = 'toast' + (isError ? ' error' : '');
-      t.classList.add('show');
-      setTimeout(() => t.classList.remove('show'), 3500);
-    }
-
-    document.getElementById('leadForm').addEventListener('submit', async e => {
-      e.preventDefault();
-
-      const aluno = document.getElementById('aluno').value.trim();
-
-      if (!aluno) {
-        document.getElementById('alunoError').style.display = 'block';
-        document.getElementById('aluno').focus();
-        return;
-      }
-
-      document.getElementById('alunoError').style.display = 'none';
-
-      const btn = document.getElementById('submitBtn');
-      const btnText = document.getElementById('submitText');
-
-      btn.disabled = true;
-      btnText.innerHTML = '<span class="spinner"></span> Enviando...';
-
-      const estado = document.getElementById('estado').value;
-      const cidade = document.getElementById('cidade').value.trim();
-
-      try {
-        const config     = await fetch('/api/config').then(r => r.json());
-        const webhookUrl = config.n8n_webhook;
-        const sheetUrl   = config.sheet_url;
-
-        if (!webhookUrl) {
-          showToast('Webhook do n8n não configurado.', true);
-          btn.disabled = false;
-          btnText.textContent = 'Enviar Lead';
-          return;
-        }
-
-        const payload = {
-          sheet_url:    sheetUrl,
-          dataLead:     document.getElementById('dataLead').value,
-          dataAulaDemo: document.getElementById('dataAulaDemo').value,
-          aluno,
-          livro:        document.getElementById('livro').value,
-          horarioAulas: document.getElementById('horarioAulas').value,
-          modalidade:   document.getElementById('modalidade').value,
-          observacao:   document.getElementById('observacao').value.trim(),
-          professor:    document.getElementById('professor').value,
-          cidade:       [cidade, estado].filter(Boolean).join(' - ')
-        };
-
-        const resp = await fetch(webhookUrl, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(payload)
-        });
-
-        if (resp.ok) {
-          showToast('✓ Lead cadastrado com sucesso!', false);
-          
-          // Reseta o formulário
-          e.target.reset();
-
-          // Restaura os valores padrão da cidade/estado após resetar
-          document.getElementById('estado').value = "DF";
-          document.getElementById('cidade').value = "Brasília";
-
-          selectedLivro = '';
-          modalidadeSel = '';
-          formatoSel = '';
-          selectedCells.clear();
-
-          [...livroBtns, ...modalidadeBtns, ...formatoBtns].forEach(b => {
-            b.classList.remove('active');
-            b.dataset._selected = '';
-          });
-
-          document.getElementById('formatoContainer').style.display = 'none';
-          document.getElementById('modalidadePreview').style.display = 'none';
-
-          document.querySelectorAll('.schedule-cell.selected').forEach(c => {
-            c.classList.remove('selected');
-            c.textContent = '·';
-          });
-
-          updateScheduleSummary();
-        } else {
-          showToast('Erro ao enviar. Tente novamente.', true);
-        }
-      } catch {
-        showToast('Erro de conexão. Verifique a rede.', true);
-      }
-
-      btn.disabled = false;
-      btnText.textContent = 'Enviar Lead';
-    });
-  </script>
-</body>
-</html>
+      modalidadeSel = toggleSelBtn(modalidadeBtns, 
