@@ -58,7 +58,7 @@ def get_n8n_url():
     config = load_config()
     return jsonify({
         'n8n_webhook': config.get('n8n_webhook', ''),
-        'sheet_url': config.get('sheet_url', '')  # <-- incluído para acompanhar o body das requisições ao webhook
+        'sheet_url': config.get('sheet_url', '')
     })
 
 @app.route('/api/config/webhook', methods=['POST'])
