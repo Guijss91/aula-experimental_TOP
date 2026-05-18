@@ -466,6 +466,7 @@
       transition: 160ms ease;
       font-weight: 700;
       border: 1px solid transparent;
+      -webkit-tap-highlight-color: transparent;
     }
 
     .schedule-cell:hover {
@@ -658,7 +659,7 @@
       <div class="hero-card">
         <div class="hero-chip">Campos com * são obrigatórios</div>
         <h1 class="hero-title">Dados do Lead</h1>
-        <p class="hero-text">Preencha os dados do Lead e da aula experimental .</p>
+        <p class="hero-text">Preencha os dados do Lead e da aula experimental.</p>
       </div>
     </section>
 
@@ -747,19 +748,11 @@
         <p class="section-label">Modalidade</p>
 
         <div class="option-grid-2" style="margin-bottom:0.9rem;">
-          <button
-            type="button"
-            class="sel-btn modalidade-btn option-card"
-            data-value="Online"
-          >
+          <button type="button" class="sel-btn modalidade-btn option-card" data-value="Online">
             🌐 Online
           </button>
 
-          <button
-            type="button"
-            class="sel-btn modalidade-btn option-card"
-            data-value="Presencial"
-          >
+          <button type="button" class="sel-btn modalidade-btn option-card" data-value="Presencial">
             🏫 Presencial
           </button>
         </div>
@@ -860,6 +853,7 @@
 
     function buildScheduleTable() {
       const tbody = document.getElementById('scheduleBody');
+      tbody.innerHTML = '';
 
       hours.forEach(h => {
         const tr = document.createElement('tr');
@@ -873,13 +867,13 @@
           const td = document.createElement('td');
           td.className = 'schedule-cell';
           td.dataset.hour = h;
-          td.dataset.day  = d;
+          td.dataset.day = d;
           td.textContent = '·';
-          td.addEventListener('click', () => toggleCell(td, h, d));
-          td.addEventListener('touchend', e => {
-            e.preventDefault();
-            toggleCell(td, h, d);
+
+          td.addEventListener('click', function () {
+            toggleCell(this);
           });
+
           tr.appendChild(td);
         });
 
@@ -887,7 +881,9 @@
       });
     }
 
-    function toggleCell(td, h, d) {
+    function toggleCell(td) {
+      const h = td.dataset.hour;
+      const d = td.dataset.day;
       const key = d + ':' + h;
 
       if (selectedCells.has(key)) {
@@ -922,10 +918,8 @@
       document.getElementById('horarioAulas').value = parts.join(', ');
     }
 
-    buildScheduleTable();
-
     function toggleSelBtn(group, clickedValue) {
-      let current = group[0]?.dataset._selected || '';
+      const current = group[0]?.dataset._selected || '';
       const next = current === clickedValue ? '' : clickedValue;
 
       group.forEach(b => {
@@ -939,16 +933,181 @@
     let selectedLivro = '';
     const livroBtns = [...document.querySelectorAll('.livro-btn')];
 
-    livroBtns.forEach(btn => btn.addEventListener('click', () => {
-      selectedLivro = toggleSelBtn(livroBtns, btn.dataset.value);
-      document.getElementById('livro').value = selectedLivro;
-    }));
+    livroBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        selectedLivro = toggleSelBtn(livroBtns, btn.dataset.value);
+        document.getElementById('livro').value = selectedLivro;
+      });
+    });
 
     let modalidadeSel = '';
     let formatosSelecionados = [];
 
     const modalidadeBtns = [...document.querySelectorAll('.modalidade-btn')];
-    const formatoBtns    = [...document.querySelectorAll('.formato-btn')];
+    const formatoBtns = [...document.querySelectorAll('.formato-btn')];
 
-    modalidadeBtns.forEach(btn => btn.addEventListener('click', () => {
-      modalidadeSel = toggleSelBtn(modalidadeBtns, 
+    modalidadeBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        modalidadeSel = toggleSelBtn(modalidadeBtns, btn.dataset.value);
+        document.getElementById('formatoContainer').style.display = modalidadeSel ? 'block' : 'none';
+
+        if (!modalidadeSel) {
+          formatosSelecionados = [];
+          formatoBtns.forEach(b => b.classList.remove('active'));
+        }
+
+        updateModalidade();
+      });
+    });
+
+    formatoBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        if (!modalidadeSel) {
+          showToast('Selecione primeiro a modalidade.', true);
+          return;
+        }
+
+        const valor = btn.dataset.value;
+
+        if (formatosSelecionados.includes(valor)) {
+          formatosSelecionados = formatosSelecionados.filter(item => item !== valor);
+          btn.classList.remove('active');
+        } else {
+          formatosSelecionados.push(valor);
+          btn.classList.add('active');
+        }
+
+        updateModalidade();
+      });
+    });
+
+    function updateModalidade() {
+      let val = modalidadeSel;
+
+      if (modalidadeSel && formatosSelecionados.length) {
+        val = `${formatosSelecionados.join(', ')} ${modalidadeSel}`;
+      }
+
+      document.getElementById('modalidade').value = val;
+
+      const preview = document.getElementById('modalidadePreview');
+      const text = document.getElementById('modalidadeText');
+
+      if (val) {
+        preview.style.display = 'block';
+        text.textContent = val;
+      } else {
+        preview.style.display = 'none';
+        text.textContent = '';
+      }
+    }
+
+    function showToast(msg, isError) {
+      const t = document.getElementById('toast');
+      t.textContent = msg;
+      t.className = 'toast' + (isError ? ' error' : '');
+      t.classList.add('show');
+      setTimeout(() => t.classList.remove('show'), 3500);
+    }
+
+    buildScheduleTable();
+    updateScheduleSummary();
+    updateModalidade();
+
+    document.getElementById('leadForm').addEventListener('submit', async e => {
+      e.preventDefault();
+
+      const aluno = document.getElementById('aluno').value.trim();
+
+      if (!aluno) {
+        document.getElementById('alunoError').style.display = 'block';
+        document.getElementById('aluno').focus();
+        return;
+      }
+
+      document.getElementById('alunoError').style.display = 'none';
+
+      const btn = document.getElementById('submitBtn');
+      const btnText = document.getElementById('submitText');
+
+      btn.disabled = true;
+      btnText.innerHTML = '<span class="spinner"></span> Enviando...';
+
+      const estado = document.getElementById('estado').value;
+      const cidade = document.getElementById('cidade').value.trim();
+
+      try {
+        const config = await fetch('/api/config').then(r => r.json());
+        const webhookUrl = config.n8n_webhook;
+        const sheetUrl = config.sheet_url;
+
+        if (!webhookUrl) {
+          showToast('Webhook do n8n não configurado.', true);
+          btn.disabled = false;
+          btnText.textContent = 'Enviar Lead';
+          return;
+        }
+
+        const payload = {
+          sheet_url: sheetUrl,
+          dataLead: document.getElementById('dataLead').value,
+          dataAulaDemo: document.getElementById('dataAulaDemo').value,
+          aluno,
+          livro: document.getElementById('livro').value,
+          horarioAulas: document.getElementById('horarioAulas').value,
+          modalidade: document.getElementById('modalidade').value,
+          observacao: document.getElementById('observacao').value.trim(),
+          professor: document.getElementById('professor').value,
+          cidade: [cidade, estado].filter(Boolean).join(' - ')
+        };
+
+        const resp = await fetch(webhookUrl, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+
+        if (resp.ok) {
+          showToast('✓ Lead cadastrado com sucesso!', false);
+
+          e.target.reset();
+
+          document.getElementById('estado').value = 'DF';
+          document.getElementById('cidade').value = 'Brasília';
+
+          selectedLivro = '';
+          modalidadeSel = '';
+          formatosSelecionados = [];
+          selectedCells.clear();
+
+          [...livroBtns, ...modalidadeBtns, ...formatoBtns].forEach(b => {
+            b.classList.remove('active');
+            b.dataset._selected = '';
+          });
+
+          document.getElementById('formatoContainer').style.display = 'none';
+          document.getElementById('modalidadePreview').style.display = 'none';
+          document.getElementById('modalidadeText').textContent = '';
+          document.getElementById('livro').value = '';
+          document.getElementById('modalidade').value = '';
+
+          document.querySelectorAll('.schedule-cell').forEach(c => {
+            c.classList.remove('selected');
+            c.textContent = '·';
+          });
+
+          updateScheduleSummary();
+          updateModalidade();
+        } else {
+          showToast('Erro ao enviar. Tente novamente.', true);
+        }
+      } catch (error) {
+        showToast('Erro de conexão. Verifique a rede.', true);
+      }
+
+      btn.disabled = false;
+      btnText.textContent = 'Enviar Lead';
+    });
+  </script>
+</body>
+</html>
